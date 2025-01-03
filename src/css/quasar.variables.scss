@@ -1,0 +1,145 @@
+// Quasar SCSS (& Sass) Variables
+// --------------------------------------------------
+// To customize the look and feel of this app, you can override
+// the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
+
+// Check documentation for full list of Quasar variables
+
+// Your own variables (that are declared here) and Quasar's own
+// ones will be available out of the box in your .vue/.scss/.sass files
+
+// It's highly recommended to change the default colors
+// to match your app's branding.
+// Tip: Use the "Theme Builder" on Quasar's documentation website.
+
+//original
+
+// $primary   : #0c5196;
+// $secondary : #1DB954;
+// $accent    : #9C27B0;
+
+// $dark      : #191414;
+// $dark-page : #121212;
+
+// $positive  : #21BA45;
+// $negative  : #C10015;
+
+// $info      : #610000;
+// $warning   : #F2C037;
+
+// .body--light {
+//   --q-primary: #0c5196;
+//   --q-secondary: #1DB954;
+//   --q-accent: #9C27B0;
+
+//   --q-dark: #191414;
+//   --q-dark-page: rgb(20, 20, 20);
+
+//   --q-positive: rgb(39, 156, 49);
+//   --q-negative: rgb(209, 77, 65);
+
+//   --q-info: #610000;
+//   --q-warning: rgb(208, 162, 21);
+// }
+
+// modern
+// .body--light {
+//   --q-primary: #8f4141;
+//   --q-secondary: #E08E45;
+//   --q-accent: #9c27b0;
+
+//   --q-dark: #191414;
+//   --q-dark-page: rgb(2, 2, 2);
+
+//   --q-positive: #3943B7;
+//   --q-negative: rgb(175, 48, 41);
+
+//   --q-info: #610000;
+//   --q-warning: rgb(173, 131, 1);
+// }
+
+//definitive
+.body--light {
+  --q-primary: #0c5196;
+  --q-secondary: #179744;
+  --q-accent: #8d1fa0;
+
+  --q-dark: #191414;
+  --q-dark-page: rgb(20, 20, 20);
+
+  --q-positive: rgb(39, 156, 49);
+  --q-negative: rgb(196, 52, 52);
+
+  --q-info: #610000;
+  --q-warning: rgb(208, 162, 21);
+}
+
+// $primary   : rgb(32, 94, 166);
+// $secondary : rgb(62, 158, 24);
+// $accent    : rgb(160, 47, 111);
+
+// $dark      : #191414;
+// $dark-page : rgb(28, 28, 28);
+
+// $positive  : #21BA45;
+// $negative  : rgb(175, 48, 41);
+
+// $info      : #610000;
+// $warning   : #F2C037;
+
+.body--dark {
+  --q-primary: rgb(32, 94, 166);
+  --q-secondary: rgb(39, 156, 49);
+  --q-accent: #9c27b0;
+
+  --q-dark: rgb(14, 19, 26);
+  --q-dark-page: rgb(28, 28, 28);
+
+  --q-positive: #21BA45;
+  --q-negative: rgb(209, 77, 65);
+
+  --q-info: #610000;
+  --q-warning: rgb(208, 162, 21);
+}
+
+
+//flexoki
+
+// $primary   : rgb(32, 94, 166);
+// $secondary : rgb(62, 158, 24);
+// $accent    : rgb(160, 47, 111);
+
+// $dark      : #191414;
+// $dark-page : rgb(28, 28, 28);
+
+// $positive  : rgb(36, 131, 123);
+// $negative  : rgb(175, 48, 41);
+
+// $info      : #610000;
+// $warning   : rgb(173, 131, 1);
+
+// formatting
+
+// .body--light {
+//   --red: red;
+//   --blue: blue;
+//   --green: green;
+//   --black: black;
+// }
+
+// .body--dark {
+//   --red: darkred;
+//   --blue: darkblue;
+//   --green: darkgreen;
+//   --black: rgb(16, 16, 16);
+// }
+
+// .drawer {
+//   background: var(--blue)
+// }
+
+// .body--dark .genreButton {background: rgb(16, 16, 16);}
+
+// .genreButton {
+//   background: var(--black);
+// }
