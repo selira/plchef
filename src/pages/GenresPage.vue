@@ -1,101 +1,167 @@
 <template>
-  <q-card style="min-width: 70%; align-self: center;">
-    <div style="display: flex; flex-direction: column; height: 100%;">
-      <div>
-        <q-card-section>
-          <div class="row justify-between">
-            <div class='row'>
-              <q-select
-                filled
-                dense
-                label="Select Genre"
-                v-model="selectedGenre"
-                :options="autocompleteGenreList"
-                option-label="name"
-                option-value="spotify_id"
-                style="width: 200px;"
-                clearable 
-              >
-                <template v-slot:no-option>
-                  <q-item>
-                    <q-item-section class="text-grey">
-                      No results
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
-              <div v-if="spotifyAuthStore.isPremium">
-                <q-btn
-                  round
-                  :color="genrePlayColor(selectedGenre?.spotify_id)"
-                  :size="!oneColumn? '11px' : '11px'"
-                  icon="arrow_right"
-                  :text-color="$q.dark.isActive ? 'black' : 'white'"
-                  @click.stop="playGenre(selectedGenre?.spotify_id)"
-                  :disable="!selectedGenre?.spotify_id"
-                  class="q-ml-sm q-mt-xs"
-                />
-              </div>
-              <div>
-                <q-btn
-                  :dense="oneColumn"
-                  label="Random"
-                  @click="selectedGenre = loadedGenresList[Math.floor(Math.random() * loadedGenresList.length)]"
-                  class="q-ml-sm q-mt-xs"
-                  color="accent"
-                />
-              </div>
-            </div>
-            <div>
-              <q-select
-                v-model="sortButton"
-                :options="sortOptions"
-                label="Sort by"
-                dense
-                outlined
-                emit-value
-                map-options
-                @update:model-value="sort"
-                style="max-width: 200px;"
-              />
-            </div>
-            <!-- <div class="self-center">
-              <q-btn-toggle
-                v-model="sortButton"
-                push
-                toggle-color="primary"
-                :options="[
-                  {label: 'Sort by popularity', value: 'pop'},
-                  {label: 'Sort by alphabetical', value: 'alpha'},
-                  {label: 'Sort by affinity', value: 'affinity'}
-                ]"
-                @update:model-value="sort"
-              />
-            </div> -->
-            <div class="self-end">
-              <q-input
-                dense
-                filled
-                :model-value="treeFilter"
-                label="Search"
-                @update:model-value="updateFilter"
-                style="width: 150px;"
-              >
-
-                <template v-slot:append>
-                  <q-icon v-if="treeFilter !== ''" name="clear" class="cursor-pointer" @click="resetFilter" />
-                </template>
-              </q-input>
-            </div>
+  <q-page class="column">
+    <div class="row justify-between">
+      <!-- <div class="col"> -->
+        <div class="row justify-evenly q-ma-sm">
+          <div v-if="!isMobile">
+            <q-select
+              filled
+              multiple
+              label="Select Genres"
+              v-model="selectedGenres"
+              :options="autocompleteGenreList"
+              option-label="name"
+              option-value="spotify_id"
+              style="width: 350px;"
+              class="q-pr-md"
+              :dense="isMobile"
+              max-values="5"
+              @add="genreSelected"
+            >
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-slot:selected-item="scope">
+                <q-chip
+                  removable
+                  @remove="scope.removeAtIndex(scope.index)"
+                  :tabindex="scope.tabindex"
+                  class="q-ma-none"
+                  style="width: max-content"
+                  @click.stop
+                >
+                  <q-avatar>
+                    <q-btn dense :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked"></q-btn>
+                  </q-avatar>
+                  {{ scope.opt.name }}
+                </q-chip>
+              </template>
+            </q-select>
           </div>
-        </q-card-section>
+          <div v-if="spotifyAuthStore.isPremium">
+            <q-btn
+              round
+              :color="genrePlayColor(selectedGenres?.spotify_id)"
+              :size="!isMobile? '11px' : '11px'"
+              icon="arrow_right"
+              :text-color="$q.dark.isActive ? 'black' : 'white'"
+              @click.stop="playGenres(selectedGenres)"
+              :disable="selectedGenres.length === 0"
+              :class="[isMobile ? 'q-ml-sm q-mt-xs q-mb-xs' : 'q-ml-sm q-mt-sm']"
+              :loading="loadingPlay"
+            />
+          </div>
+          <div>
+            <q-btn
+              label="Random"
+              @click="random()"
+              :class="[isMobile ? 'q-ml-md q-mt-xs q-mb-xs' : 'q-ml-md q-mt-sm']"
+              color="accent"
+            />
+          </div>
+          <div>
+            <q-btn
+              label="Random 5"
+              @click="random(true)"
+              :class="[isMobile ? 'q-ml-md q-mt-xs q-mb-xs' : 'q-ml-md q-mt-sm']"
+              color="accent"
+            />
+          </div>
+        </div>
+      <!-- </div> -->
+      <div class="row justify-end q-pa-sm">
+        <div>
+          <q-select
+            v-model="sortButton"
+            :options="sortOptions"
+            label="Sort by"
+            :dense="isMobile"
+            outlined
+            emit-value
+            map-options
+            @update:model-value="sort"
+            style="max-width: 200px;"
+          />
+        </div>
+        <!-- <div class="self-center">
+          <q-btn-toggle
+            v-model="sortButton"
+            push
+            toggle-color="primary"
+            :options="[
+              {label: 'Sort by popularity', value: 'pop'},
+              {label: 'Sort by alphabetical', value: 'alpha'},
+              {label: 'Sort by affinity', value: 'affinity'}
+            ]"
+            @update:model-value="sort"
+          />
+        </div> -->
+        <div class="q-ml-md">
+          <q-input
+            :dense="isMobile"
+            filled
+            :model-value="treeFilter"
+            label="Search"
+            @update:model-value="updateFilter"
+            :style="{'width': isMobile ? '150px' : '300px'}"
+          >
+
+            <template v-slot:append>
+              <q-icon v-if="treeFilter !== ''" name="clear" class="cursor-pointer" @click="resetFilter" />
+            </template>
+          </q-input>
+        </div>
+      </div>
+      </div>
+      <div>
+        <q-select
+            filled
+            multiple
+            label="Select Genres"
+            v-model="selectedGenres"
+            :options="autocompleteGenreList"
+            option-label="name"
+            option-value="spotify_id"
+            style="width: 350px;"
+            class="q-px-sm q-mt-xs q-mb-sm"
+            :dense="isMobile"
+            max-values="5"
+            @add="genreSelected"
+            v-if="isMobile"
+          >
+            <template v-slot:no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  No results
+                </q-item-section>
+              </q-item>
+            </template>
+            <template v-slot:selected-item="scope">
+              <q-chip
+                removable
+                @remove="scope.removeAtIndex(scope.index)"
+                :tabindex="scope.tabindex"
+                class="q-ma-none"
+                style="width: max-content"
+                @click.stop
+              >
+                <q-avatar>
+                  <q-btn dense :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked"></q-btn>
+                </q-avatar>
+                {{ scope.opt.name }}
+              </q-chip>
+            </template>
+          </q-select>
       </div>
       <q-separator />
 
       <div style="min-height: 0px; flex: 1 1 auto; overflow-y: auto;">
       <!-- <q-card-section class="scroll col-9" style="max-height: 65vh; min-height: 60vh;">  -->
-        <q-card-section>
-          <div :class="{'q-pa-md': !oneColumn, 'q-gutter-sm': !oneColumn}">
+          <div :class="{'q-pa-md': !isMobile, 'q-gutter-sm': !isMobile}">
             <div v-for="tree in loadedGenresTree"  :key="tree.index">
             <q-tree
               :nodes="[tree]"
@@ -109,27 +175,39 @@
             >
               <template v-slot:default-header="prop">
                 <div class="textColor">
-                  <q-radio
-                    v-model="selectedGenre"
-                    :val="prop.node"
-                    :disable="prop.node.spotify_id === null"
-                    padding="none"
-                    :size="!oneColumn? 'lg' : 'xl'"
-                    dense
-                  />
+                  <q-btn 
+                    @click.stop="addGenre(prop.node)" 
+                    flat 
+                    round 
+                    class="q-ma-none q-pa-none" 
+                    :size="!isMobile? '11px' : '14px'" 
+                    dense 
+                    outline
+                    :disable="prop.node.spotify_id === null || selectedGenres.length >= 5 || selectedGenres.some((genre2: any) => genre2.spotify_id === prop.node.spotify_id)"
+                  >
+                    <q-icon
+                      name="add"
+                      size="sm"
+                      class="q-ma-none q-pa-none"
+                    />
+                  </q-btn>
+                  <!-- <q-icon 
+                    name="add" 
+                    @click.stop="addGenre(prop.node)" 
+                  /> -->
                   <q-btn
                     v-if="spotifyAuthStore.isPremium"
                     dense
                     round
                     :color="genrePlayColor(prop.node.spotify_id)"
-                    :size="!oneColumn? '11px' : '14px'"
+                    :size="!isMobile? '11px' : '14px'"
                     icon="arrow_right"
                     :text-color="$q.dark.isActive ? 'black' : 'white'"
                     @click.stop="playGenre(prop.node.spotify_id)"
                     :disable="prop.node.spotify_id === null"
                     class="q-ml-sm"
                   >
-                    <!-- <q-tooltip v-if="!oneColumn">
+                    <!-- <q-tooltip v-if="!isMobile">
                       {{ prop.node.spotify_id === null ? 'No Preview Available' : 'Play Random Preview Clip' }}
                     </q-tooltip> -->
                   </q-btn>
@@ -139,24 +217,37 @@
             </q-tree>
             </div>
           </div>
-        </q-card-section>
       </div>
       <q-separator />
-      <div>
-        <q-card-section>
-          <q-btn @click="searchGenre" color="primary" class="q-mr-sm">Search Genre</q-btn>
-          <q-btn @click="closeDialog" color="negative" click="negative">Cancel</q-btn>
-        </q-card-section>
-      </div>
-    </div>
-  </q-card>
+    <!-- <div class="row justify-center fixed-bottom-left">
+      <q-btn
+        v-if="showIcon"
+        @click="addSelectionToPlaylist()"
+        color="primary"
+        size="18px"
+        :disable="disabledAddSelectionButton()"
+        :loading="addSelectionLoading"
+        :icon="totalNumberOfSongs === 0 ? 'arrow_back' : 'add'"
+      ></q-btn>
+      <q-btn
+        v-else
+        @click="addSelectionToPlaylist()"
+        color="primary"
+        size="18px" 
+        :disable="disabledAddSelectionButton()"
+        style="min-width: 250px;"
+        :loading="addSelectionLoading"
+      > {{ totalNumberOfSongs === 0 ? 'Go Back to Playlist' : 'Add Selection To Playlist'}}
+        <q-tooltip v-if="totalNumberOfSongsInPlaylist.value >= maxNumberSongsInPlaylist">
+          Maximum number of songs reached
+        </q-tooltip>
+      </q-btn>
+    </div> -->
+  </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-// import genresTree from '../data/genre_tree_with_index2.json'
-// import genresTree from '../data/genre_tree.json'
-// import genresList from '../data/genre_list.json'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { useSpotifyRequests } from '../stores/requests'
 import { useGenresStore } from '../stores/genres'
 import { useGenreDataStore } from '../stores/genre-data'
@@ -164,24 +255,16 @@ import { useSpotifyAuthStore } from '../stores/spotify_auth'
 import { useQuasar } from 'quasar'
 // import { parseInt } from 'lodash'
 
-const emit = defineEmits<{
-  (e: 'closeDialog'): void
-  (e: 'searchGenre', selection: any): void
-  (e: 'playSong', song: any, playerType: string): void
-  (e: 'closePlayer'): void
-}>()
-
 const $q = useQuasar()
 
 const currentVersion = '1.0.1'
 
-const props = defineProps<{ oneColumn: boolean }>()
-
 const requestsStore = useSpotifyRequests()
 const genresStore = useGenresStore()
 const genreDataStore = useGenreDataStore()
+const isMobile = ref(false)
 
-const selectedGenre = ref(null) as any
+const selectedGenres = ref([]) as any
 const loadedGenresTree = ref([]) as any
 const loadedGenresList = ref([]) as any
 const autocompleteGenreList = ref([]) as any
@@ -198,21 +281,24 @@ const sortOptions = ref([
                 ])
 const favoriteGenres = ref({}) as any
 const expandedGenres = ref({}) as any
+const loadingPlay = ref(false)
 
 onMounted(async () => {
   await loadGenres()
   loadFavoriteGenres()
   setGenreKeys()
   setGenresStoreValues()
+  window.addEventListener("resize", resizeListener)
+  resizeListener()
   // sort(sortButton.value)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("resize", resizeListener)
 })
 
 watch(() => sortButton.value, (value) => {
   genreDataStore.sortOption = value
-})
-
-watch(() => selectedGenre.value, () => {
-  genresStore.selectedGenre = selectedGenre.value
 })
 
 watch(() => expandedGenres.value, (value) => {
@@ -235,9 +321,6 @@ function genrePlayColor(spotify_id: any) {
 function setGenresStoreValues() {
   if (genreDataStore.sortOption) {
     sortButton.value = genreDataStore.sortOption
-  }
-  if (genresStore.selectedGenre) {
-    selectedGenre.value = genresStore.selectedGenre
   }
   if (genresStore.expandedGenres) {
     expandedGenres.value = genresStore.expandedGenres
@@ -266,28 +349,42 @@ function updateFilter(val: any) {
   autocompleteGenreList.value = loadedGenresList.value.filter((v: any) => v.name.toLocaleLowerCase().indexOf(needle) > -1)
 }
 
-function closeDialog() {
-  if (props.oneColumn) {
-    emit('closePlayer')
+async function playGenres(genres : any[]) {
+  loadingPlay.value = true
+  const songs = []
+  const four = genres.length <= 2
+  const nsongs = Math.ceil(50 / genres.length)
+  for (const genre of genres) {
+    songs.push(...await getSongs(genre, four, nsongs))
   }
-  emit('closeDialog')
+  const shuffledSongs = songs.sort(() => Math.random() - 0.5)
+  const playUrl = 'https://api.spotify.com/v1/me/player/play'
+  const body = {
+    // context_uri: context,
+    uris: shuffledSongs.map((track: any) => track.uri),
+  }
+  requestsStore.putRequest(playUrl, body)
+  loadingPlay.value = false
 }
 
-function searchGenre() {
-  // if (selectedSpotifyId.value !== '') {
-  //   emit('searchGenre', selectedSpotifyId.value)
-  //   return
-  // }
-  // const gl = loadedGenresList.value as any
-  // var genre = gl.find((item: any) => item.name === selectedGenre.value)
-  // if (genre === undefined) {
-  //   emit('searchGenre', selectedGenre.value)
-  //   return
-  // }
-  if (props.oneColumn) {
-    emit('closePlayer')
+async function getSongs(genre: any, four: boolean, nsongs: number) {
+  const url = `https://api.spotify.com/v1/search?q=genre:"${encodeURIComponent(genre.spotify_id)}"&type=track&limit=50&` + new URLSearchParams({market})
+  const url2 = `https://api.spotify.com/v1/search?q=genre:"${encodeURIComponent(genre.spotify_id)}"&type=track&limit=50&offset=50&` + new URLSearchParams({market})
+  const url3 = `https://api.spotify.com/v1/search?q=genre:"${encodeURIComponent(genre.spotify_id)}"&type=track&limit=50&offset=100&` + new URLSearchParams({market})
+  const url4 = `https://api.spotify.com/v1/search?q=genre:"${encodeURIComponent(genre.spotify_id)}"&type=track&limit=50&offset=150&` + new URLSearchParams({market})
+
+  const urls = four ? [url, url2, url3, url4] : [url, url2]
+
+  const promises = urls.map((url) => requestsStore.getRequest(url))
+  const tracks = []
+  await requestsStore.tryRefreshToken()
+  for (const response of await Promise.all(promises)) {
+    if (response?.data?.tracks?.items && response.status === 200) {
+      tracks.push(...response.data.tracks.items)
+    }
   }
-  emit('searchGenre', selectedGenre.value.spotify_id)
+  const shuffledTracks = tracks.sort(() => Math.random() - 0.5).slice(0, nsongs)
+  return shuffledTracks
 }
 
 async function playGenre(spotify_id: any) {
@@ -349,6 +446,92 @@ async function playGenre(spotify_id: any) {
 // function playSong(song: any) {
 //   emit('playSong', song, props.oneColumn ? 'mini_modal' : 'normal')
 // }
+
+async function random(five = false) {
+  let possibleGenres = autocompleteGenreList.value.filter((genre: any) => genre.spotify_id !== null)
+  if (treeFilter.value !== '') {
+    possibleGenres = possibleGenres.concat(searchTree())
+  }
+  for (let i = 0; i < 5; i++) {
+    if (selectedGenres.value[i] && selectedGenres.value[i].locked) {
+      continue
+    }
+    if (possibleGenres.length === 0) {
+      return
+    }
+    let genre = {} as any
+    let count = 0
+    while (true) {
+      genre = possibleGenres[Math.floor(Math.random() * possibleGenres.length)]
+      if (genre.spotify_id !== null && !selectedGenres.value.some((genre2: any) => genre2.spotify_id === genre.spotify_id)) {
+        break
+      }
+      count++
+      if (count > 20) { // if it can't find a genre after 20 tries, just return
+        return
+      }
+    }
+    genre.locked = false
+    selectedGenres.value[i] = genre
+    if (!five) {
+      return
+    }
+  }
+}
+
+function searchTree() {
+  // get all genres that are children if genre matches one of the base genres
+  const ret = []
+  const baseGenres = loadedGenresTree.value.filter((genre: any) => genre?.name?.toLowerCase().includes(treeFilter.value.toLowerCase()))
+  for (const baseGenre of baseGenres) {
+    ret.push(...searchTreeHelper(baseGenre))
+  }
+  return ret
+}
+
+function searchTreeHelper(genre: any): any {
+  const ret = []
+  if (genre.spotify_id !== null) {
+    ret.push(genre)
+  }
+  if (genre.subgenres) {
+    for (const subgenre of genre.subgenres) {
+      ret.push(...searchTreeHelper(subgenre))
+    }
+  }
+  return ret
+}
+
+// async function random5() {
+//   for (let i = 0; i < 5; i++) {
+//     if (selectedGenres.value[i] && selectedGenres.value[i].locked) {
+//       continue
+//     }
+//     if (autocompleteGenreList.value.length === 0) {
+//       return
+//     }
+//     const genre = autocompleteGenreList.value[Math.floor(Math.random() * autocompleteGenreList.value.length)]
+//     genre.locked = false
+//     selectedGenres.value[i] = genre
+//   }
+// }
+
+async function genreSelected(details: any) {
+  details.value.locked = false
+}
+
+function addGenre(genre: any) {
+  if (genre.spotify_id === null || selectedGenres.value.length >= 5 || selectedGenres.value.some((genre2: any) => genre2.spotify_id === genre.spotify_id)) {
+    return
+  }
+  for (let i = 0; i < 5; i++) {
+    if (selectedGenres.value[i] === undefined) {
+      genre.locked = false
+      selectedGenres.value[i] = genre
+      return
+    }
+  }
+}
 
 async function loadGenres() {
   if (genreDataStore.genresList && genreDataStore.genresTree && genreDataStore.version === currentVersion) {
@@ -550,6 +733,15 @@ function subgenresLabel(genre: any): string {
 //   }
 //   return 'radio_button_unchecked'
 // }
+
+function resizeListener() {
+  const width = window.innerWidth
+  if (width < 1024) {
+    isMobile.value = true
+  } else {
+    isMobile.value = false
+  }
+}
 </script>
 
 <style>

@@ -386,7 +386,6 @@ import { useQuasar } from 'quasar'
 const emit = defineEmits<{
   (e: 'playSong', song: any, playerType: string, context: any): void
   (e: 'closePlayer'): void
-  (e: 'update', value: string): void
 }>()
 
 defineExpose({

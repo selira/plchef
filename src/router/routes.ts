@@ -14,6 +14,14 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/genres',
+    component: () => import('layouts/LayoutWithoutSidebar.vue'),
+    children: [{ path: '', component: () => import('pages/GenresPage.vue') }],
+    meta: {
+      requiresAuth: true,
+    }
+  },
+  {
     path: '/login',
     component: () => import('layouts/LayoutWithoutSidebar.vue'),
     children: [{ path: '', component: () => import('pages/LoginPage.vue') }]

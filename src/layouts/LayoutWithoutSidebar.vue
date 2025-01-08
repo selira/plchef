@@ -38,6 +38,7 @@
       <q-tabs align="left">
         <q-route-tab to="/" :label="spotifyAuthStore.isLoggedIn ? 'Playlist' : 'Home'" />
         <q-route-tab to="/artists" label="Artists" v-if="spotifyAuthStore.isLoggedIn"/>
+        <q-route-tab to="/genres" label="Genres"/>
       </q-tabs>
     </q-header>
 

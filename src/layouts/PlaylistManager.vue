@@ -42,6 +42,7 @@
         v-if="spotifyAuthStore.isLoggedIn">
         <q-route-tab to="/" label="Playlist" />
         <q-route-tab to="/artists" label="Artists" />
+        <q-route-tab to="/genres" label="Genres"/>
       </q-tabs>
     </q-header>
 
@@ -343,6 +344,20 @@
         <div class="row justify-between">
           <div class="column text-grey-0 q-mr-md">
             <a
+              href='https://github.com/selira/plchef' 
+              target="_blank"
+              v-if="!isMobile"
+            >
+              <q-btn
+                flat
+                dense
+                no-caps
+                color="white"
+                label="Github"
+                class="q-mt-sm"
+              />
+            </a>
+            <a
               href='https://docs.google.com/forms/d/e/1FAIpQLSeGgHcVQB1GinBAzR65c5WtfkjDkKLbZ6ORGCgu5zftnT6uKA/viewform?usp=sf_link' 
               target="_blank"
               v-if="!isMobile"
@@ -353,11 +368,24 @@
                 no-caps
                 color="white"
                 label="Feedback/Contact"
-                class="q-mt-sm"
               />
             </a>
           </div>
           <div class="column text-grey-0">
+            <a
+              href='https://github.com/selira/plchef' 
+              target="_blank"
+              v-if="isMobile"
+            >
+              <q-btn
+                flat
+                dense
+                no-caps
+                color="white"
+                label="Github"
+                class="q-mt-sm"
+              />
+            </a>
             <a
               href='https://docs.google.com/forms/d/e/1FAIpQLSeGgHcVQB1GinBAzR65c5WtfkjDkKLbZ6ORGCgu5zftnT6uKA/viewform?usp=sf_link' 
               target="_blank"
@@ -369,7 +397,6 @@
                 no-caps
                 color="white"
                 label="Feedback/Contact"
-                class="q-mt-sm"
               />
             </a>
             <q-btn
@@ -515,9 +542,6 @@ function toggleRightDrawer () {
 }
 
 onBeforeMount(async () => {
-  if ($q.platform.is.mobile) {
-    isMobile.value = true
-  }
   playlistSections.value = playlistSectionsStore.playlistSections
   playlistName.value = 'PLChef Playlist (' + new Date().toDateString() + ')'
   const urlParams = new URLSearchParams(window.location.search);
