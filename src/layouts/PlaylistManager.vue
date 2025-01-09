@@ -58,7 +58,7 @@
           >
             <q-item-section>
               <q-item-label class="tableText">
-                {{ truncateString(playlistSection.name, 28) }} {{ playlistSection.selection ? '/' : '' }} {{ playlistSection.selection }}
+                {{ truncateString(playlistSection.name, 28) }} {{ playlistSection.selection && playlistSection.name ? '/' : '' }} {{ playlistSection.selection }}
               </q-item-label>
             </q-item-section>
             <q-item-section avatar side>

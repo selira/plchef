@@ -29,8 +29,27 @@ export const usePlaylistSectionsStore = defineStore('playlistSections', {
       })
     },
 
+    addGenreSongs(songs: any, genreName: string) {
+      let hasSongs = false
+      const sectionId = this.sectionId++
+      songs.forEach((song: any) => {
+        if (this.playlistSongs.find((playlistSong: any) => playlistSong.id === song.id)) {
+          return
+        }
+        hasSongs = true
+        this.playlistSongs.push(this.formattedSong(song, sectionId))
+      })
+      if (hasSongs) {
+        this.playlistSections.push({
+          id: sectionId,
+          name: '',
+          selection: 'Genre: ' + genreName
+        })
+      }
+    },
+
     addSingleTrack(song: any, sectionName: string): void {
-      const sectionId = this.addSeparateSongsSection(sectionName)
+      const sectionId = this.addSeparateSongsSection(sectionName, '')
       this.playlistSongs.push(this.formattedSong(song, sectionId))
     },
 
@@ -42,14 +61,14 @@ export const usePlaylistSectionsStore = defineStore('playlistSections', {
       }
     },
 
-    addSeparateSongsSection(sectionName: string): number {
+    addSeparateSongsSection(sectionName: string, selectionName: string): number {
       const section = this.playlistSections.find((section: any) => section.name === sectionName)
       if (!section) {
         const sectionId = this.sectionId++
         this.playlistSections.push({
           id: sectionId,
           name: sectionName,
-          selection: ''
+          selection: selectionName
         })
         return sectionId
       }

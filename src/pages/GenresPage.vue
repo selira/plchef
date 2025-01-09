@@ -73,89 +73,111 @@
           </div>
         </div>
       <!-- </div> -->
-      <div class="row justify-end q-pa-sm">
-        <div>
-          <q-select
-            v-model="sortButton"
-            :options="sortOptions"
-            label="Sort by"
-            :dense="isMobile"
-            outlined
-            emit-value
-            map-options
-            @update:model-value="sort"
-            style="max-width: 200px;"
-          />
-        </div>
-        <!-- <div class="self-center">
-          <q-btn-toggle
-            v-model="sortButton"
-            push
-            toggle-color="primary"
-            :options="[
-              {label: 'Sort by popularity', value: 'pop'},
-              {label: 'Sort by alphabetical', value: 'alpha'},
-              {label: 'Sort by affinity', value: 'affinity'}
-            ]"
-            @update:model-value="sort"
-          />
-        </div> -->
-        <div class="q-ml-md">
-          <q-input
-            :dense="isMobile"
-            filled
-            :model-value="treeFilter"
-            label="Search"
-            @update:model-value="updateFilter"
-            :style="{'width': isMobile ? '150px' : '300px'}"
-          >
+        <div class="row justify-end q-pa-sm">
+          <div>
+            <q-select
+              v-model="sortButton"
+              :options="sortOptions"
+              label="Sort by"
+              :dense="isMobile"
+              outlined
+              emit-value
+              map-options
+              @update:model-value="sort"
+              style="max-width: 200px;"
+            />
+          </div>
+          <!-- <div class="self-center">
+            <q-btn-toggle
+              v-model="sortButton"
+              push
+              toggle-color="primary"
+              :options="[
+                {label: 'Sort by popularity', value: 'pop'},
+                {label: 'Sort by alphabetical', value: 'alpha'},
+                {label: 'Sort by affinity', value: 'affinity'}
+              ]"
+              @update:model-value="sort"
+            />
+          </div> -->
+          <div class="q-ml-md">
+            <q-input
+              :dense="isMobile"
+              filled
+              :model-value="treeFilter"
+              label="Search"
+              @update:model-value="updateFilter"
+              :style="{'width': isMobile ? '150px' : '300px'}"
+            >
 
-            <template v-slot:append>
-              <q-icon v-if="treeFilter !== ''" name="clear" class="cursor-pointer" @click="resetFilter" />
-            </template>
-          </q-input>
+              <template v-slot:append>
+                <q-icon v-if="treeFilter !== ''" name="clear" class="cursor-pointer" @click="resetFilter" />
+              </template>
+            </q-input>
+          </div>
         </div>
-      </div>
+        <div class="q-pa-sm row">
+          <q-badge color="secondary">
+            Songs Per Genre: {{ songsPerGenre }}
+          </q-badge>
+
+          <q-slider
+            :model-value="songsPerGenre"
+            @change="songsPerGenreChanged"
+            :min="1"
+            :max="200"
+            :step="1"
+            color="primary"
+            label
+          />
+        </div>
+        <div class="q-pa-sm column">
+          <div> Songs selected: {{ numberOfSongsSelected }} </div>
+          <div> Songs in playlist: {{ numberSongsInPlaylist }} </div>
+          <div :style="totalNumberOfSongsInPlaylist > maxNumberSongsInPlaylist ? 'color: red' : ''"> 
+            Total songs: {{ totalNumberOfSongsInPlaylist }} / {{ maxNumberSongsInPlaylist }}
+          </div>
+        </div>
       </div>
       <div>
         <q-select
-            filled
-            multiple
-            label="Select Genres"
-            v-model="selectedGenres"
-            :options="autocompleteGenreList"
-            option-label="name"
-            option-value="spotify_id"
-            style="width: 350px;"
-            class="q-px-sm q-mt-xs q-mb-sm"
-            :dense="isMobile"
-            max-values="5"
-            @add="genreSelected"
-            v-if="isMobile"
-          >
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  No results
-                </q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:selected-item="scope">
-              <q-chip
-                removable
-                @remove="scope.removeAtIndex(scope.index)"
-                :tabindex="scope.tabindex"
-                class="q-ma-none"
-                style="width: max-content"
-                @click.stop
-              >
-                <q-avatar>
-                  <q-btn dense :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked"></q-btn>
-                </q-avatar>
-                {{ scope.opt.name }}
-              </q-chip>
-            </template>
-          </q-select>
+          filled
+          multiple
+          label="Select Genres"
+          v-model="selectedGenres"
+          :options="autocompleteGenreList"
+          option-label="name"
+          option-value="spotify_id"
+          style="width: 350px;"
+          class="q-px-sm q-mt-xs q-mb-sm"
+          :dense="isMobile"
+          max-values="5"
+          @add="genreSelected"
+          v-if="isMobile"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:selected-item="scope">
+            <q-chip
+              removable
+              @remove="scope.removeAtIndex(scope.index)"
+              :tabindex="scope.tabindex"
+              class="q-ma-none"
+              style="width: max-content"
+              @click.stop
+            >
+              <q-avatar>
+                <q-btn dense :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked"></q-btn>
+              </q-avatar>
+              {{ scope.opt.name }}
+            </q-chip>
+          </template>
+        </q-select>
       </div>
       <q-separator />
 
@@ -183,10 +205,10 @@
                     :size="!isMobile? '11px' : '14px'" 
                     dense 
                     outline
-                    :disable="prop.node.spotify_id === null || selectedGenres.length >= 5 || selectedGenres.some((genre2: any) => genre2.spotify_id === prop.node.spotify_id)"
+                    :disable="prop.node.spotify_id === null || (selectedGenres.length >= 5 && !selectedGenres.some((genre2: any) => genre2.spotify_id === prop.node.spotify_id))"
                   >
                     <q-icon
-                      name="add"
+                      :name="selectedGenres.some((genre2: any) => genre2.spotify_id === prop.node.spotify_id) ? 'check' : 'add'"
                       size="sm"
                       class="q-ma-none q-pa-none"
                     />
@@ -219,6 +241,34 @@
           </div>
       </div>
       <q-separator />
+      <br>
+      <br>
+      <br>
+      <br>
+      <div class="row justify-center fixed-bottom-left">
+        <q-btn
+          v-if="isMobile"
+          @click="addSelectionToPlaylist()"
+          color="primary"
+          size="18px"
+          :disable="disabledAddSelectionButton()"
+          :loading="addSelectionLoading"
+          :icon="selectedGenres.length === 0 ? 'arrow_back' : 'add'"
+        ></q-btn>
+        <q-btn
+          v-else
+          @click="addSelectionToPlaylist()"
+          color="primary"
+          size="18px" 
+          :disable="disabledAddSelectionButton()"
+          style="min-width: 250px;"
+          :loading="addSelectionLoading"
+        > {{ selectedGenres.length === 0 ? 'Go Back to Playlist' : 'Add Selection To Playlist'}}
+          <q-tooltip v-if="totalNumberOfSongsInPlaylist.value >= maxNumberSongsInPlaylist">
+            Maximum number of songs reached
+          </q-tooltip>
+        </q-btn>
+      </div>
     <!-- <div class="row justify-center fixed-bottom-left">
       <q-btn
         v-if="showIcon"
@@ -247,21 +297,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSpotifyRequests } from '../stores/requests'
 import { useGenresStore } from '../stores/genres'
 import { useGenreDataStore } from '../stores/genre-data'
 import { useSpotifyAuthStore } from '../stores/spotify_auth'
+import { usePlaylistSectionsStore } from '../stores/playlist-sections'
 import { useQuasar } from 'quasar'
 // import { parseInt } from 'lodash'
 
 const $q = useQuasar()
+const router = useRouter()
 
 const currentVersion = '1.0.1'
 
 const requestsStore = useSpotifyRequests()
 const genresStore = useGenresStore()
 const genreDataStore = useGenreDataStore()
+const playlistSectionsStore = usePlaylistSectionsStore()
 const isMobile = ref(false)
 
 const selectedGenres = ref([]) as any
@@ -282,6 +336,9 @@ const sortOptions = ref([
 const favoriteGenres = ref({}) as any
 const expandedGenres = ref({}) as any
 const loadingPlay = ref(false)
+const songsPerGenre = ref(50)
+const maxNumberSongsInPlaylist = 1000
+const addSelectionLoading = ref(false)
 
 onMounted(async () => {
   await loadGenres()
@@ -331,6 +388,14 @@ function setGenresStoreValues() {
 //   selectedGenre.value = genre
 // }
 
+function disabledAddSelectionButton() {
+  return totalNumberOfSongsInPlaylist.value > maxNumberSongsInPlaylist
+}
+
+function songsPerGenreChanged(value: any) {
+  songsPerGenre.value = value
+}
+
 function resetFilter() {
   treeFilter.value = ''
   autocompleteGenreList.value = loadedGenresList.value
@@ -347,6 +412,26 @@ function updateFilter(val: any) {
   treeFilter.value = val
   const needle = val.toLocaleLowerCase()
   autocompleteGenreList.value = loadedGenresList.value.filter((v: any) => v.name.toLocaleLowerCase().indexOf(needle) > -1)
+}
+
+async function addSelectionToPlaylist() {
+  addSelectionLoading.value = true
+  if (selectedGenres.value.length === 0) {
+    router.push({ path: '/'})
+    addSelectionLoading.value = false
+    return
+  }
+  for (const genre of selectedGenres.value) {
+    if (genre.spotify_id === null) {
+      addSelectionLoading.value = false
+      return
+    }
+    const songs = await getSongs(genre, songsPerGenre.value >= 30, songsPerGenre.value)
+    playlistSectionsStore.addGenreSongs(songs, genre.name)
+  }
+  selectedGenres.value = []
+  $q.notify('Selected genres added to playlist')
+  addSelectionLoading.value = false
 }
 
 async function playGenres(genres : any[]) {
@@ -521,6 +606,15 @@ async function genreSelected(details: any) {
 }
 
 function addGenre(genre: any) {
+  if (selectedGenres.value.some((genre2: any) => genre2.spotify_id === genre.spotify_id)){
+    // remove genre
+    for (let i = 0; i < 5; i++) {
+      if (selectedGenres.value[i].spotify_id === genre.spotify_id) {
+        selectedGenres.value.splice(i, 1)
+        return
+      }
+    }
+  }
   if (genre.spotify_id === null || selectedGenres.value.length >= 5 || selectedGenres.value.some((genre2: any) => genre2.spotify_id === genre.spotify_id)) {
     return
   }
@@ -742,6 +836,18 @@ function resizeListener() {
     isMobile.value = false
   }
 }
+
+const numberOfSongsSelected = computed(() => {
+  return selectedGenres.value.length * songsPerGenre.value
+})
+
+const numberSongsInPlaylist = computed(() => {
+  return playlistSectionsStore.playlistSongs.length
+})
+
+const totalNumberOfSongsInPlaylist = computed(() => {
+  return numberOfSongsSelected.value + numberSongsInPlaylist.value
+})
 </script>
 
 <style>
