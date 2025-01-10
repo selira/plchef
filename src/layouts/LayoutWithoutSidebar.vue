@@ -12,6 +12,7 @@
         <q-separator/>
 
         <q-btn flat label="Logout" @click="spotifySignOut" class="q-mr-md" v-if="spotifyAuthStore.isLoggedIn && !isMobile" />
+        <q-btn flat icon="person" label="Login" class="q-mr-md" v-if="!spotifyAuthStore.isLoggedIn"  @click="router.push('/login')"></q-btn>
         <q-btn flat icon="person" :label="isMobile ? '' : spotifyUsername" class="q-mr-md" v-if="spotifyAuthStore.isLoggedIn">
           <q-menu v-if="isMobile">
             <q-list>

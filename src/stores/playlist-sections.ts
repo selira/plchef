@@ -42,8 +42,8 @@ export const usePlaylistSectionsStore = defineStore('playlistSections', {
       if (hasSongs) {
         this.playlistSections.push({
           id: sectionId,
-          name: '',
-          selection: 'Genre: ' + genreName
+          name: genreName,
+          selection: 'Genre'
         })
       }
     },

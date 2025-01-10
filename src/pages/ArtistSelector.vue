@@ -85,7 +85,7 @@
         </div>
         <div class="col-7 q-pt-md q-pl-md q-pr-md q-pb-xs">
           <div v-if="defaultArtistSelection.value === 'top-10'">
-            <q-badge color="secondary">
+            <q-badge color="secondary" style="height: 25px;">
               Default Number of Songs: {{ defaultNumberOfSongs }}
             </q-badge>
 

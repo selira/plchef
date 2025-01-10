@@ -4,7 +4,7 @@ export const useGenresStore = defineStore('genres', {
   state: () => ({
     expandedGenres: null as any,
     selectedGenre: null as any,
-    favoritesLoaded: false
+    selectedGenres: [] as any
   }),
   getters: {
   },

@@ -5,6 +5,7 @@ export const useGenreDataStore = defineStore('genresData', {
     genresTree: null as any,
     genresList: null as any,
     sortOption: null as any,
+    favoritesLoaded: false,
     version: null as any
   }),
   getters: {

@@ -24,6 +24,7 @@
             </q-list>
           </q-menu>
         </q-btn>
+        <q-btn flat icon="person" label="Login" class="q-mr-md" v-if="!spotifyAuthStore.isLoggedIn"  @click="router.push('/login')"></q-btn>
         <q-toggle
           :model-value="$q.dark.isActive"
           @update:model-value="setDarkMode"
@@ -39,9 +40,9 @@
 
       <q-tabs
         align="left"
-        v-if="spotifyAuthStore.isLoggedIn">
-        <q-route-tab to="/" label="Playlist" />
-        <q-route-tab to="/artists" label="Artists" />
+      >
+        <q-route-tab to="/" :label="spotifyAuthStore.isLoggedIn ? 'Playlist' : 'Home'" />
+        <q-route-tab to="/artists" label="Artists" v-if="spotifyAuthStore.isLoggedIn" />
         <q-route-tab to="/genres" label="Genres"/>
       </q-tabs>
     </q-header>
@@ -130,7 +131,7 @@
             </div>
             <div class="col-8">
               <q-input
-                v-model="playlistName"
+                v-model="stateStore.playlistName"
                 label="Playlist Name"
                 dense
                 maxlength="100"
@@ -149,7 +150,7 @@
               class="q-mx-xs q-mb-sm"
               style="min-width: 150px;"
               :loading="createPlaylistLoading"
-              :disable="selectedSongs.length === 0 || playlistName === ''"
+              :disable="selectedSongs.length === 0 || stateStore.playlistName === ''"
               :dense="isMobile"
             >Export Playlist</q-btn>
             <q-btn
@@ -429,6 +430,7 @@ import { usePlaylistSectionsStore } from '../stores/playlist-sections'
 import { useSpotifyRequests } from '../stores/requests'
 import { useSpotifyAuthStore } from '../stores/spotify_auth'
 import { useLocalStorageStore } from '../stores/local-storage'
+import { useStateStore } from '../stores/state'
 import { useRouter } from 'vue-router'
 import { useQuasar, QTableProps } from 'quasar'
 import { spotifyImage } from '../functions/utils'
@@ -439,6 +441,8 @@ const spotifyAuthStore = useSpotifyAuthStore()
 const playlistSectionsStore = usePlaylistSectionsStore()
 const localStorageStore = useLocalStorageStore()
 const requestsStore = useSpotifyRequests()
+const stateStore = useStateStore()
+
 const router = useRouter()
 
 const isMobile = ref(false)
@@ -450,8 +454,6 @@ const addToPlaylistLoading = ref(false)
 
 const playlistSections = ref([]) as any
 const rightDrawerOpen = ref(false)
-
-const playlistName = ref('')
 const selectedSongs = ref([]) as any
 
 const playlistUrl = ref('')
@@ -543,7 +545,6 @@ function toggleRightDrawer () {
 
 onBeforeMount(async () => {
   playlistSections.value = playlistSectionsStore.playlistSections
-  playlistName.value = 'PLChef Playlist (' + new Date().toDateString() + ')'
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   window.addEventListener("resize", resizeListener)
@@ -637,7 +638,7 @@ async function createPlaylist() {
 
   const createPlaylistUrl = `https://api.spotify.com/v1/users/${user_id}/playlists`
   const createPlaylistBody = {
-    name: playlistName.value,
+    name: stateStore.playlistName,
     description: 'Songs from: ' + sectionNames(),
   }
   const response = await requestsStore.postRequest(createPlaylistUrl, createPlaylistBody)
@@ -709,6 +710,9 @@ function sectionNames() {
   return playlistSections.value.map((section: any) => {
     if (section.selection === 'Recommended songs based on artist') {
       return section.name + ' (Recs)'
+    }
+    if (section.name === '') {
+      return section.selection
     }
     return section.name
   }).join(', ').slice(0, 280)

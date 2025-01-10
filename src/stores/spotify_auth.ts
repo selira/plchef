@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useSpotifyRequests } from '../stores/requests'
+import { useGenreDataStore } from './genre-data';
 
 export const useSpotifyAuthStore = defineStore('spotifyAuth', {
   state: () => ({
@@ -76,6 +77,8 @@ export const useSpotifyAuthStore = defineStore('spotifyAuth', {
         this.isLoggedIn = true
         this.expireTime = Date.now() + responsejSON.expires_in * 1000
         this.setPremiumStatus()
+        useGenreDataStore().favoritesLoaded = false
+
         // this.setMarket()
       }
     },

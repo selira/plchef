@@ -184,6 +184,8 @@ const genreDataStore = useGenreDataStore()
 const selectedGenre = ref(null) as any
 const loadedGenresTree = ref([]) as any
 const loadedGenresList = ref([]) as any
+const loadingGenresTree = ref([]) as any
+const loadingGenresList = ref([]) as any
 const autocompleteGenreList = ref([]) as any
 const genrePlaying = ref('') as any
 const treeFilter = ref('') as any
@@ -200,11 +202,12 @@ const favoriteGenres = ref({}) as any
 const expandedGenres = ref({}) as any
 
 onMounted(async () => {
+  $q.loading.show({message: 'Loading genres...'})
   await loadGenres()
-  loadFavoriteGenres()
   setGenreKeys()
   setGenresStoreValues()
   // sort(sortButton.value)
+  $q.loading.hide()
 })
 
 watch(() => sortButton.value, (value) => {
@@ -352,29 +355,33 @@ async function playGenre(spotify_id: any) {
 
 async function loadGenres() {
   if (genreDataStore.genresList && genreDataStore.genresTree && genreDataStore.version === currentVersion) {
-    loadedGenresList.value = genreDataStore.genresList
-    loadedGenresTree.value = genreDataStore.genresTree
-    genresStore.favoritesLoaded = true
+    loadingGenresList.value = JSON.parse(JSON.stringify(genreDataStore.genresList))
+    loadingGenresTree.value = JSON.parse(JSON.stringify(genreDataStore.genresTree))
   } else {
     const res = await fetch(process.env.NODE_ENV === 'development' ? 'data/mini_genre_list.json' : 'data/genre_list.json')
-    loadedGenresList.value = await res.json()
+    loadingGenresList.value = await res.json()
     const res2 = await fetch(process.env.NODE_ENV === 'development' ? 'data/mini_genre_tree.json' : 'data/genre_tree.json')
-    loadedGenresTree.value = await res2.json()
+    loadingGenresTree.value = await res2.json()
     genreDataStore.version = currentVersion
     genreDataStore.sortOption = 'pop'
-    updateGenresStore()
   }
+  if (spotifyAuthStore.isLoggedIn) {
+    await loadFavoriteGenres()
+  }
+  loadedGenresList.value = loadingGenresList.value
+  loadedGenresTree.value = loadingGenresTree.value
   autocompleteGenreList.value = loadedGenresList.value
+  updateGenresStore()
 }
 
 async function loadFavoriteGenres() {
-  if (genresStore.favoritesLoaded) { // favorites must be loaded each time since it changes with user listen history, annoying though
+  if (genreDataStore.favoritesLoaded) { // favorites must be loaded each time since it changes with user listen history, annoying though
     sortOptions.value.push({label: 'Affinity', value: 'affinity'})
     return
   }
-  requestFavoriteGenres()
+  await requestFavoriteGenres()
   // autocompleteGenreList.value = loadedGenresList.value
-  genresStore.favoritesLoaded = true
+  genreDataStore.favoritesLoaded = true
   sortOptions.value.push({label: 'Affinity', value: 'affinity'})
 }
 
@@ -382,48 +389,32 @@ async function requestFavoriteGenres() {
   const timeRanges = ['short_term', 'medium_term', 'long_term']
   const promises = timeRanges.map((timeRange) => loadFavoriteGenresForTimeRange(timeRange))
   await Promise.all(promises)
-  // for (const timeRange of timeRanges) {
-  //   await loadFavoriteGenresForTimeRange(timeRange)
-  // }
-  //gl as array of favoriteGenres like [{genre: 'pop', affinity: 5}, {genre: 'rock', affinity: 3}]
-  // const gl = Object.keys(favoriteGenres.value).map((key) => {
-  //   return {spotify_id: key, affinity: favoriteGenres.value[key]}
-  // })
-  // console.log(gl.sort((a: any, b: any) => (a.affinity > b.affinity) ? 1 : -1))
-  insertFavoriteGenresIntoTree(loadedGenresTree.value)
-  insertFavoriteGenresIntoList(loadedGenresList.value)
-  updateGenresStore()
+  insertFavoriteGenresIntoTree(loadingGenresTree.value)
+  insertFavoriteGenresIntoList(loadingGenresList.value)
 }
 
 function updateGenresStore() {
-  genreDataStore.genresList = loadedGenresList.value
-  genreDataStore.genresTree = loadedGenresTree.value
+  genreDataStore.genresList = JSON.parse(JSON.stringify(loadedGenresList.value))
+  genreDataStore.genresTree = JSON.parse(JSON.stringify(loadedGenresTree.value))
 }
 
 function insertFavoriteGenresIntoTree(genres: any[]): number {
   // inserts favorite values from favoriteGenres variable into tree genre objects with same genre value as the key
   let totalAffinity = 0
   for (const genre of genres) {
+    genre.affinity = 0
     if (favoriteGenres.value[genre.spotify_id] !== undefined) {
-      if (genre.affinity === undefined) {
-        genre.affinity = favoriteGenres.value[genre.spotify_id]
-      } else {
-        genre.affinity += favoriteGenres.value[genre.spotify_id]
-      }
-      totalAffinity += genre.affinity
+      genre.affinity += favoriteGenres.value[genre.spotify_id]
     }
     if (genre.subgenres && genre.subgenres.length > 0) {
       const subgenresAffinity = insertFavoriteGenresIntoTree(genre.subgenres)
-      if (genre.affinity === undefined) {
-        genre.affinity = subgenresAffinity
-      } else {
-        genre.affinity += subgenresAffinity
-      }
-      totalAffinity += subgenresAffinity
+      genre.affinity += subgenresAffinity
     }
+    totalAffinity += genre.affinity
   }
   return totalAffinity
 }
+
 
 function insertFavoriteGenresIntoList(genres: any[]) {
   // inserts favorite values from favoriteGenres variable into list genre objects with same genre value as the key

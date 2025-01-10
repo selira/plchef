@@ -1,6 +1,6 @@
 <template>
   <q-page class="column">
-    <div class="row justify-between">
+    <div :class="[isMobile ? 'row justify-center' : 'row justify-between']">
       <!-- <div class="col"> -->
         <div class="row justify-evenly q-ma-sm">
           <div v-if="!isMobile">
@@ -50,10 +50,14 @@
               icon="arrow_right"
               :text-color="$q.dark.isActive ? 'black' : 'white'"
               @click.stop="playGenres(selectedGenres)"
-              :disable="selectedGenres.length === 0"
-              :class="[isMobile ? 'q-ml-sm q-mt-xs q-mb-xs' : 'q-ml-sm q-mt-sm']"
+              :disable="selectedGenres.length === 0 || !spotifyAuthStore.isLoggedIn"
+              :class="[isMobile ? 'q-mt-xs q-mb-xs' : 'q-ml-sm q-mt-sm']"
               :loading="loadingPlay"
-            />
+            >
+              <q-tooltip>
+                {{ spotifyAuthStore.isLoggedIn ? 'Play selected genres' : 'Login to Spotify with a premium subscription to play the selected genres' }} 
+              </q-tooltip>
+            </q-btn>
           </div>
           <div>
             <q-btn
@@ -116,22 +120,22 @@
             </q-input>
           </div>
         </div>
-        <div class="q-pa-sm row">
-          <q-badge color="secondary">
+        <div class="q-pa-sm column" :style="{'width': isMobile ? '150px' : '200px'}">
+          <q-badge color="secondary" style="height: 30px; text-align: center">
             Songs Per Genre: {{ songsPerGenre }}
           </q-badge>
 
           <q-slider
             :model-value="songsPerGenre"
             @change="songsPerGenreChanged"
-            :min="1"
+            :min="5"
             :max="200"
-            :step="1"
+            :step="5"
             color="primary"
             label
           />
         </div>
-        <div class="q-pa-sm column">
+        <div class="q-pa-sm column q-ml-sm q-mr-sm">
           <div> Songs selected: {{ numberOfSongsSelected }} </div>
           <div> Songs in playlist: {{ numberSongsInPlaylist }} </div>
           <div :style="totalNumberOfSongsInPlaylist > maxNumberSongsInPlaylist ? 'color: red' : ''"> 
@@ -181,7 +185,7 @@
       </div>
       <q-separator />
 
-      <div style="min-height: 0px; flex: 1 1 auto; overflow-y: auto;">
+      <div style="min-height: 0px; flex: 1 1 auto; overflow-y: auto;" class="q-ml-sm">
       <!-- <q-card-section class="scroll col-9" style="max-height: 65vh; min-height: 60vh;">  -->
           <div :class="{'q-pa-md': !isMobile, 'q-gutter-sm': !isMobile}">
             <div v-for="tree in loadedGenresTree"  :key="tree.index">
@@ -226,12 +230,12 @@
                     icon="arrow_right"
                     :text-color="$q.dark.isActive ? 'black' : 'white'"
                     @click.stop="playGenre(prop.node.spotify_id)"
-                    :disable="prop.node.spotify_id === null"
+                    :disable="prop.node.spotify_id === null || !spotifyAuthStore.isLoggedIn"
                     class="q-ml-sm"
                   >
-                    <!-- <q-tooltip v-if="!isMobile">
-                      {{ prop.node.spotify_id === null ? 'No Preview Available' : 'Play Random Preview Clip' }}
-                    </q-tooltip> -->
+                    <q-tooltip v-if="!spotifyAuthStore.isLoggedIn">
+                      Login to Spotify with a premium subscription to play the genre
+                    </q-tooltip>
                   </q-btn>
                   <span class="q-ml-sm textColor">{{ prop.node.name + ' ' + subgenresLabel(prop.node) }}</span>
                 </div>
@@ -254,7 +258,11 @@
           :disable="disabledAddSelectionButton()"
           :loading="addSelectionLoading"
           :icon="selectedGenres.length === 0 ? 'arrow_back' : 'add'"
-        ></q-btn>
+        >
+          <q-tooltip v-if="!spotifyAuthStore.isLoggedIn">
+            Login to Spotify to add the selection
+          </q-tooltip>
+        </q-btn>
         <q-btn
           v-else
           @click="addSelectionToPlaylist()"
@@ -264,8 +272,8 @@
           style="min-width: 250px;"
           :loading="addSelectionLoading"
         > {{ selectedGenres.length === 0 ? 'Go Back to Playlist' : 'Add Selection To Playlist'}}
-          <q-tooltip v-if="totalNumberOfSongsInPlaylist.value >= maxNumberSongsInPlaylist">
-            Maximum number of songs reached
+          <q-tooltip v-if="!spotifyAuthStore.isLoggedIn && selectedGenres.length !== 0">
+            Login to Spotify to add the selection
           </q-tooltip>
         </q-btn>
       </div>
@@ -321,6 +329,8 @@ const isMobile = ref(false)
 const selectedGenres = ref([]) as any
 const loadedGenresTree = ref([]) as any
 const loadedGenresList = ref([]) as any
+const loadingGenresTree = ref([]) as any
+const loadingGenresList = ref([]) as any
 const autocompleteGenreList = ref([]) as any
 const genrePlaying = ref('') as any
 const treeFilter = ref('') as any
@@ -341,13 +351,14 @@ const maxNumberSongsInPlaylist = 1000
 const addSelectionLoading = ref(false)
 
 onMounted(async () => {
+  $q.loading.show({message: 'Loading genres...'})
   await loadGenres()
-  loadFavoriteGenres()
   setGenreKeys()
   setGenresStoreValues()
   window.addEventListener("resize", resizeListener)
   resizeListener()
   // sort(sortButton.value)
+  $q.loading.hide()
 })
 
 onUnmounted(() => {
@@ -361,6 +372,10 @@ watch(() => sortButton.value, (value) => {
 watch(() => expandedGenres.value, (value) => {
   genresStore.expandedGenres = value
 }, { deep: true })
+
+watch(() => selectedGenres.value, (value) => {
+  genresStore.selectedGenres = value
+})
 
 function setGenreKeys() {
   for (const genre of loadedGenresTree.value) {
@@ -382,6 +397,9 @@ function setGenresStoreValues() {
   if (genresStore.expandedGenres) {
     expandedGenres.value = genresStore.expandedGenres
   }
+  if (genresStore.selectedGenres) {
+    selectedGenres.value = genresStore.selectedGenres
+  }
 }
 
 // function selectGenre(genre: any) {
@@ -389,7 +407,7 @@ function setGenresStoreValues() {
 // }
 
 function disabledAddSelectionButton() {
-  return totalNumberOfSongsInPlaylist.value > maxNumberSongsInPlaylist
+  return totalNumberOfSongsInPlaylist.value > maxNumberSongsInPlaylist || (!spotifyAuthStore.isLoggedIn && selectedGenres.value.length !== 0)
 }
 
 function songsPerGenreChanged(value: any) {
@@ -629,29 +647,33 @@ function addGenre(genre: any) {
 
 async function loadGenres() {
   if (genreDataStore.genresList && genreDataStore.genresTree && genreDataStore.version === currentVersion) {
-    loadedGenresList.value = genreDataStore.genresList
-    loadedGenresTree.value = genreDataStore.genresTree
-    genresStore.favoritesLoaded = true
+    loadingGenresList.value = JSON.parse(JSON.stringify(genreDataStore.genresList))
+    loadingGenresTree.value = JSON.parse(JSON.stringify(genreDataStore.genresTree))
   } else {
     const res = await fetch(process.env.NODE_ENV === 'development' ? 'data/mini_genre_list.json' : 'data/genre_list.json')
-    loadedGenresList.value = await res.json()
+    loadingGenresList.value = await res.json()
     const res2 = await fetch(process.env.NODE_ENV === 'development' ? 'data/mini_genre_tree.json' : 'data/genre_tree.json')
-    loadedGenresTree.value = await res2.json()
+    loadingGenresTree.value = await res2.json()
     genreDataStore.version = currentVersion
     genreDataStore.sortOption = 'pop'
-    updateGenresStore()
   }
+  if (spotifyAuthStore.isLoggedIn) {
+    await loadFavoriteGenres()
+  }
+  loadedGenresList.value = loadingGenresList.value
+  loadedGenresTree.value = loadingGenresTree.value
   autocompleteGenreList.value = loadedGenresList.value
+  updateGenresStore()
 }
 
 async function loadFavoriteGenres() {
-  if (genresStore.favoritesLoaded) { // favorites must be loaded each time since it changes with user listen history, annoying though
+  if (genreDataStore.favoritesLoaded) { // favorites must be loaded each time since it changes with user listen history, annoying though
     sortOptions.value.push({label: 'Affinity', value: 'affinity'})
     return
   }
-  requestFavoriteGenres()
+  await requestFavoriteGenres()
   // autocompleteGenreList.value = loadedGenresList.value
-  genresStore.favoritesLoaded = true
+  genreDataStore.favoritesLoaded = true
   sortOptions.value.push({label: 'Affinity', value: 'affinity'})
 }
 
@@ -659,45 +681,28 @@ async function requestFavoriteGenres() {
   const timeRanges = ['short_term', 'medium_term', 'long_term']
   const promises = timeRanges.map((timeRange) => loadFavoriteGenresForTimeRange(timeRange))
   await Promise.all(promises)
-  // for (const timeRange of timeRanges) {
-  //   await loadFavoriteGenresForTimeRange(timeRange)
-  // }
-  //gl as array of favoriteGenres like [{genre: 'pop', affinity: 5}, {genre: 'rock', affinity: 3}]
-  // const gl = Object.keys(favoriteGenres.value).map((key) => {
-  //   return {spotify_id: key, affinity: favoriteGenres.value[key]}
-  // })
-  // console.log(gl.sort((a: any, b: any) => (a.affinity > b.affinity) ? 1 : -1))
-  insertFavoriteGenresIntoTree(loadedGenresTree.value)
-  insertFavoriteGenresIntoList(loadedGenresList.value)
-  updateGenresStore()
+  insertFavoriteGenresIntoTree(loadingGenresTree.value)
+  insertFavoriteGenresIntoList(loadingGenresList.value)
 }
 
 function updateGenresStore() {
-  genreDataStore.genresList = loadedGenresList.value
-  genreDataStore.genresTree = loadedGenresTree.value
+  genreDataStore.genresList = JSON.parse(JSON.stringify(loadedGenresList.value))
+  genreDataStore.genresTree = JSON.parse(JSON.stringify(loadedGenresTree.value))
 }
 
 function insertFavoriteGenresIntoTree(genres: any[]): number {
   // inserts favorite values from favoriteGenres variable into tree genre objects with same genre value as the key
   let totalAffinity = 0
   for (const genre of genres) {
+    genre.affinity = 0
     if (favoriteGenres.value[genre.spotify_id] !== undefined) {
-      if (genre.affinity === undefined) {
-        genre.affinity = favoriteGenres.value[genre.spotify_id]
-      } else {
-        genre.affinity += favoriteGenres.value[genre.spotify_id]
-      }
-      totalAffinity += genre.affinity
+      genre.affinity += favoriteGenres.value[genre.spotify_id]
     }
     if (genre.subgenres && genre.subgenres.length > 0) {
       const subgenresAffinity = insertFavoriteGenresIntoTree(genre.subgenres)
-      if (genre.affinity === undefined) {
-        genre.affinity = subgenresAffinity
-      } else {
-        genre.affinity += subgenresAffinity
-      }
-      totalAffinity += subgenresAffinity
+      genre.affinity += subgenresAffinity
     }
+    totalAffinity += genre.affinity
   }
   return totalAffinity
 }
@@ -855,5 +860,9 @@ const totalNumberOfSongsInPlaylist = computed(() => {
   .q-tree--dark .q-tree__node-header-content {
     color: rgb(220, 220, 220);
   }
+}
+
+.q-slider--editable .q-slider__track-container {
+  cursor: pointer;
 }
 </style>
