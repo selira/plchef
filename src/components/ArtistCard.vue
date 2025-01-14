@@ -30,7 +30,7 @@
               :loading="randomSongLoading"
             >
               <q-tooltip v-if="numberOfCols > 1">
-                Play random song
+                Queue random selection
               </q-tooltip>
             </q-btn>
           </div>
@@ -107,7 +107,7 @@
                 style="cursor: pointer;"
                 @click.stop
               >
-                <q-menu>
+                <q-menu auto-close>
                   <q-list>
                     <!-- <q-item
                       key="related-artists"
@@ -122,6 +122,15 @@
                       @click="openSpotifyAppLink()"
                     >
                       <q-item-section>Open Spotify</q-item-section>
+                    </q-item>
+                    <q-item
+                      key="spotify-app-link"
+                      clickable
+                      @click="playCurrentSelection()"
+                      :disable="playCurrentSelectionDisabled()"
+                      v-if="spotifyAuthStore.isPremium"
+                    >
+                      <q-item-section>Play Selection Shuffled</q-item-section>
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -770,7 +779,7 @@ async function playTopSong() {
 
 function artistSelected() {
   if (artist.value.selection.value === 'top-10' && artist.value.loadedSongs.length === 0) {
-    loadTopTenSongsWithTimeout(5)
+    loadTopTenSongsWithTimeout(0)
   }
   if (artist.value.selection.value === 'latest-release' && artist.value.loadedSongs.length === 0) {
     loadLatestRelease()
@@ -824,7 +833,11 @@ async function loadRandomSongs() {
     shuffledSongs = songs.sort(() => Math.random() - 0.5)
   }
   artist.value.loadedSongs = shuffledSongs
-  artist.value.numberOfSongs = Math.min(shuffledSongs.length, props.defaultNumberOfRandomSongs)
+  if (props.defaultNumberOfRandomSongs === 201) {
+    artist.value.numberOfSongs = shuffledSongs.length
+  } else {
+    artist.value.numberOfSongs = Math.min(shuffledSongs.length, props.defaultNumberOfRandomSongs)
+  }
   emit('updateSelectedArtistsStore')
 }
 
@@ -1107,6 +1120,20 @@ async function loadRandomSong() {
   await playRandomSongs(artist.value)
   randomSongLoading.value = false
   return
+}
+
+function playCurrentSelectionDisabled() {
+  return artist.value.loadedSongs.length === 0 || !artist.value.selected
+}
+
+async function playCurrentSelection() {
+  const playUrl = 'https://api.spotify.com/v1/me/player/play'
+  const songs = artist.value.loadedSongs.sort(() => Math.random() - 0.5).slice(0, 50)
+  const body = {
+    // context_uri: context,
+    uris: songs.map((track: any) => track.uri),
+  }
+  requestsStore.putRequest(playUrl, body)
 }
 
 async function loadAlbumsPopularity40(albums: any) {

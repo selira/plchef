@@ -80,6 +80,7 @@
                 label="Search"
                 @update:model-value="updateFilter"
                 style="width: 150px;"
+                debounce="500"
               >
 
                 <template v-slot:append>

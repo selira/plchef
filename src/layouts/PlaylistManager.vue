@@ -108,7 +108,16 @@
             </div>
           </q-btn>
         </div>
-        <div v-if="!spotifyAuthStore.isLoggedIn" class="col">
+        <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg">
+          <q-btn color="accent" push @click="router.push('genres')" size="lg">
+            <div class="row items-center no-wrap">
+              <div class="text-center">
+                Browse Genres
+              </div>
+            </div>
+          </q-btn>
+        </div>
+        <!-- <div v-if="!spotifyAuthStore.isLoggedIn" class="col">
           <p class="q-ma-none q-pa-none">Demo:</p>
           <iframe
             :width="isMobile ? 300 : 560" :height="isMobile ? 200 : 316" src="https://www.youtube.com/embed/W4AZOf0nGqU?si=19PSHzOlvCgLD_9h" 
@@ -118,9 +127,21 @@
           >
           </iframe>
           
-        </div>
+        </div> -->
         <div v-if="spotifyAuthStore.isLoggedIn" class="q-pa-md">
-          <div class="row justify-between">
+          <div class="row justify-between" v-if="isMobile">
+            <div class="col-12 q-mt-sm">
+              <q-input
+                v-model="stateStore.playlistName"
+                label="Playlist Name"
+                dense
+                maxlength="100"
+                clearabl
+              >
+              </q-input>
+            </div>
+          </div>
+          <div class="row justify-between" v-else>
             <div class="col-3">
               <q-btn
                 color="positive"
@@ -129,7 +150,15 @@
                 label="Artists"
               ></q-btn>
             </div>
-            <div class="col-8">
+            <div class="col-3">
+              <q-btn
+                color="accent"
+                @click="goToGenresPage"
+                icon="add"
+                label="Genres"
+              ></q-btn>
+            </div>
+            <div class="col-6">
               <q-input
                 v-model="stateStore.playlistName"
                 label="Playlist Name"
@@ -348,6 +377,7 @@
               href='https://github.com/selira/plchef' 
               target="_blank"
               v-if="!isMobile"
+              style="text-align: center;"
             >
               <q-btn
                 flat
@@ -377,6 +407,7 @@
               href='https://github.com/selira/plchef' 
               target="_blank"
               v-if="isMobile"
+              style="text-align: center;"
             >
               <q-btn
                 flat
@@ -618,6 +649,10 @@ watch(selectedSongs, (newVal) => {
 
 function goToArtistsPage() {
   router.push('/artists')
+}
+
+function goToGenresPage() {
+  router.push('/genres')
 }
 
 function toMinuteSecond(miliseconds: number) {

@@ -128,16 +128,17 @@
             </q-card>
           </div>
           <div v-else-if="defaultArtistSelection.value === 'random'">
-            <q-badge color="secondary">
-              Default Number of Songs: {{ randomSelectionNumberOfSongs }}
+            <q-badge color="secondary" style="height: 25px;">
+              Default Number of Songs: {{ randomSelectionNumberOfSongs === 201 ? 'All' : randomSelectionNumberOfSongs }}
             </q-badge>
             <q-slider
               v-model="randomSelectionNumberOfSongs"
               label
               color="primary"
               :min="1"
-              :max="100"
+              :max="201"
               :step="1"
+              :label-value="randomLabel"
             />
             <q-toggle
               v-model="prioritizePopularAlbums"
@@ -148,12 +149,13 @@
 
           </div>
           <div v-else-if="defaultArtistSelection.value === 'most-popular'">
-            <q-badge color="secondary">
+            <q-badge color="secondary" style="height: 25px;">
               Number Of Albums: {{ defaultNumberOfAlbums }}
             </q-badge>
 
             <q-slider
-              v-model="defaultNumberOfAlbums"
+              :model-value="defaultNumberOfAlbums"
+              @change="defaultNumberOfAlbumsChanged"
               :min="1"
               :max="40"
               :step="1"
@@ -376,6 +378,7 @@ import { useSpotifyRequests } from '../stores/requests'
 import { useSpotifyAuthStore } from '../stores/spotify_auth'
 import { usePlaylistSectionsStore } from '../stores/playlist-sections'
 import { useSelectedArtistsStore } from '../stores/selected-artists'
+import { useStateStore } from '../stores/state'
 import { useRouter, useRoute } from 'vue-router'
 import { spotifyImage } from '../functions/utils'
 import type { Ref } from 'vue'
@@ -399,6 +402,7 @@ const requestsStore = useSpotifyRequests()
 const playlistSectionsStore = usePlaylistSectionsStore()
 const selectedArtistsStore = useSelectedArtistsStore()
 const spotifyAuthStore = useSpotifyAuthStore()
+const stateStore = useStateStore()
 const market = spotifyAuthStore.market || 'US'
 const maxNumberSongsInPlaylist = 1000
 const genreArtistsPerPage = 50
@@ -490,8 +494,10 @@ onMounted(async () => {
     })
   }
   setArtistQuery()
+  // setLastQueryState()
   const loadedArtists = await getArtists()
   saveArtists(loadedArtists, true)
+  setDefaultArtistSelectionFromState()
   window.addEventListener("resize", resizeListener)
   window.addEventListener('popstate', closeAllDialogs)
   resizeListener()
@@ -500,9 +506,26 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  setLastQueryState()
+  setDefaultArtistSelectionState()
   window.removeEventListener("resize", resizeListener)
   window.removeEventListener("popstate", closeAllDialogs)
   // window.removeEventListener("resize", showSmallerAddToPlaylistButton)
+})
+
+watch(route, async (newRoute) => {
+  if (JSON.stringify(newRoute.query) === JSON.stringify(oldRouteQuery.value)) return
+  loadingArtists.value = true
+  oldRouteQuery.value = Object.assign({}, newRoute.query)
+  selectedGenreName.value = ''
+  setArtistQuery()
+  const loadedArtists = await getArtists()
+  saveArtists(loadedArtists)
+  // doesn't work very well with 20 per page.
+  if (route.query.page && numberOfCols.value === 1) {
+    artistsDiv.value.scrollIntoView({ behavior: "smooth" })
+  }
+  loadingArtists.value = false
 })
 
 watch(defaultArtistSelection, async (newDefault) => {
@@ -562,21 +585,6 @@ const automaticRecommendationsInfo = computed(() => {
 // watch(selectedArtists, async (newSelected, _oldSelected) => {
 //   selectedArtistsStore.selectedArtists = newSelected
 // }, { deep: true })
-
-watch(route, async (newRoute) => {
-  if (JSON.stringify(newRoute.query) === JSON.stringify(oldRouteQuery.value)) return
-  loadingArtists.value = true
-  oldRouteQuery.value = Object.assign({}, newRoute.query)
-  selectedGenreName.value = ''
-  setArtistQuery()
-  const loadedArtists = await getArtists()
-  saveArtists(loadedArtists)
-  // doesn't work very well with 20 per page.
-  if (route.query.page && numberOfCols.value === 1) {
-    artistsDiv.value.scrollIntoView({ behavior: "smooth" })
-  }
-  loadingArtists.value = false
-})
 
 function updateSelectedArtistsStore() {
   selectedArtistsStore.selectedArtists = selectedArtists.value
@@ -702,8 +710,37 @@ function setArtistQuery() {
     }
   }
   else {
-    artistQuery.value = {title: 'My Top Artists (Short Term - 4 weeks)', value: 'top-short'}
+    artistQuery.value = JSON.parse(JSON.stringify(stateStore.lastArtistQuery.artistQuery))
+    pageNumber.value = JSON.parse(JSON.stringify(stateStore.lastArtistQuery.pageNumber))
+    selectedGenre.value = JSON.parse(JSON.stringify(stateStore.lastArtistQuery.selectedGenre.spotifyId))
+    selectedGenreName.value = JSON.parse(JSON.stringify(stateStore.lastArtistQuery.selectedGenre.name))
+    followedArtistCursors.value = JSON.parse(JSON.stringify(stateStore.lastArtistQuery.followedArtistCursors))
   }
+}
+
+function setLastQueryState() {
+  stateStore.lastArtistQuery.artistQuery = JSON.parse(JSON.stringify(artistQuery.value))
+  stateStore.lastArtistQuery.pageNumber = JSON.parse(JSON.stringify(pageNumber.value))
+  stateStore.lastArtistQuery.selectedGenre = JSON.parse(JSON.stringify({spotifyId: selectedGenre.value, name: selectedGenreName.value}))
+  stateStore.lastArtistQuery.followedArtistCursors = JSON.parse(JSON.stringify(followedArtistCursors.value))
+}
+
+function setDefaultArtistSelectionState() {
+  stateStore.defaultArtistSelection.defaultArtistSelection = JSON.parse(JSON.stringify(defaultArtistSelection.value))
+  stateStore.defaultArtistSelection.defaultNumberOfSongs = JSON.parse(JSON.stringify(defaultNumberOfSongs.value))
+  stateStore.defaultArtistSelection.shuffleTopTen = JSON.parse(JSON.stringify(shuffleTopTen.value))
+  stateStore.defaultArtistSelection.defaultNumberOfAlbums = JSON.parse(JSON.stringify(defaultNumberOfAlbums.value))
+  stateStore.defaultArtistSelection.randomSelectionNumberOfSongs = JSON.parse(JSON.stringify(randomSelectionNumberOfSongs.value))
+  stateStore.defaultArtistSelection.prioritizePopularAlbums = JSON.parse(JSON.stringify(prioritizePopularAlbums.value))
+}
+
+function setDefaultArtistSelectionFromState() {
+  defaultArtistSelection.value = JSON.parse(JSON.stringify(stateStore.defaultArtistSelection.defaultArtistSelection))
+  defaultNumberOfSongs.value = JSON.parse(JSON.stringify(stateStore.defaultArtistSelection.defaultNumberOfSongs))
+  shuffleTopTen.value = JSON.parse(JSON.stringify(stateStore.defaultArtistSelection.shuffleTopTen))
+  defaultNumberOfAlbums.value = JSON.parse(JSON.stringify(stateStore.defaultArtistSelection.defaultNumberOfAlbums))
+  randomSelectionNumberOfSongs.value = JSON.parse(JSON.stringify(stateStore.defaultArtistSelection.randomSelectionNumberOfSongs))
+  prioritizePopularAlbums.value = JSON.parse(JSON.stringify(stateStore.defaultArtistSelection.prioritizePopularAlbums))
 }
 
 function pageNumberChange() {
@@ -760,6 +797,14 @@ function defaultNumberOfSongsChanged(value: number) {
       artist.numberOfSongs = defaultNumberOfSongs.value
     }
   }
+}
+
+function randomSelectionNumberOfSongsChanged(value: number) {
+  randomSelectionNumberOfSongs.value = value
+}
+
+function defaultNumberOfAlbumsChanged(value: number) {
+  defaultNumberOfAlbums.value = value
 }
 
 function artistsQueryChanged() {
@@ -880,7 +925,7 @@ function selectRelatedArtists(relatedArtists: any) {
 
 async function artistSelected(artist: any) {
   if (artist.selection.value === 'top-10' && artist.loadedSongs.length === 0) {
-    loadTopTenSongsWithTimeout(artist, 5)
+    loadTopTenSongsWithTimeout(artist, 0)
   }
 }
 
@@ -1085,6 +1130,8 @@ const menuOptionsClassWithoutPadding = computed(() => {
   }
   return `col-${12/numberOfCols.value} row optionsCell`
 })
+
+const randomLabel = computed(() => randomSelectionNumberOfSongs.value === 201 ? 'All' : randomSelectionNumberOfSongs.value.toString())
 
 function resizeListener() {
   const width = window.innerWidth

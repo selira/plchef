@@ -30,12 +30,13 @@
                   removable
                   @remove="scope.removeAtIndex(scope.index)"
                   :tabindex="scope.tabindex"
-                  class="q-ma-none"
+                  class="q-ma-none q-mr-xl"
                   style="width: max-content"
                   @click.stop
+                  size="15px"
                 >
                   <q-avatar>
-                    <q-btn dense :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked"></q-btn>
+                    <q-btn dense round :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked" size="13px"></q-btn>
                   </q-avatar>
                   {{ scope.opt.name }}
                 </q-chip>
@@ -110,6 +111,7 @@
               filled
               :model-value="treeFilter"
               label="Search"
+              debounce="500"
               @update:model-value="updateFilter"
               :style="{'width': isMobile ? '150px' : '300px'}"
             >
@@ -171,12 +173,13 @@
               removable
               @remove="scope.removeAtIndex(scope.index)"
               :tabindex="scope.tabindex"
-              class="q-ma-none"
+              class="q-ma-none q-mr-xl"
               style="width: max-content"
               @click.stop
+              size="17px"
             >
               <q-avatar>
-                <q-btn dense :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked"></q-btn>
+                <q-btn dense round :icon="scope.opt.locked ? 'lock' : 'no_encryption'" @click.stop="scope.opt.locked = !scope.opt.locked"></q-btn>
               </q-avatar>
               {{ scope.opt.name }}
             </q-chip>
@@ -216,6 +219,19 @@
                       size="sm"
                       class="q-ma-none q-pa-none"
                     />
+                  </q-btn>
+                  <q-btn
+                    v-if="!isMobile"
+                    :disable=" prop.node.spotify_id === null || !spotifyAuthStore.isLoggedIn"
+                    @click.stop="router.push({ path: '/artists', query: {genre: prop.node.spotify_id}})"
+                    color="black"
+                    label="Artists"
+                    dense
+                    class="q-ml-sm"
+                  >
+                    <q-tooltip v-if="!spotifyAuthStore.isLoggedIn">
+                      Login to Spotify to search for artists
+                    </q-tooltip>
                   </q-btn>
                   <!-- <q-icon 
                     name="add" 
@@ -271,7 +287,7 @@
           :disable="disabledAddSelectionButton()"
           style="min-width: 250px;"
           :loading="addSelectionLoading"
-        > {{ selectedGenres.length === 0 ? 'Go Back to Playlist' : 'Add Selection To Playlist'}}
+        > {{ selectedGenres.length === 0 ? 'Go Back to ' + homePage : 'Add Selection To Playlist'}}
           <q-tooltip v-if="!spotifyAuthStore.isLoggedIn && selectedGenres.length !== 0">
             Login to Spotify to add the selection
           </q-tooltip>
@@ -349,6 +365,8 @@ const loadingPlay = ref(false)
 const songsPerGenre = ref(50)
 const maxNumberSongsInPlaylist = 1000
 const addSelectionLoading = ref(false)
+
+const homePage = spotifyAuthStore.isLoggedIn ? 'Playlist' : 'Home'
 
 onMounted(async () => {
   $q.loading.show({message: 'Loading genres...'})

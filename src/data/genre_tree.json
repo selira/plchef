@@ -28666,12 +28666,6 @@
                                 "spotify_id": "speed garage",
                                 "subgenres": [],
                                 "popularity": 2562
-                            },
-                            {
-                                "name": "Garage Psych",
-                                "spotify_id": "garage psych",
-                                "subgenres": [],
-                                "popularity": 3987
                             }
                         ],
                         "popularity": 1724
@@ -30340,6 +30334,12 @@
                                 "spotify_id": "broken transmission",
                                 "subgenres": [],
                                 "popularity": 3607
+                            },
+                            {
+                                "name": "Liminal Space",
+                                "spotify_id": "liminal Space",
+                                "subgenres": [],
+                                "popularity": 2500
                             },
                             {
                                 "name": "Mallsoft",
@@ -48399,6 +48399,12 @@
                         "spotify_id": "acid rock",
                         "subgenres": [],
                         "popularity": 706
+                    },
+                    {
+                        "name": "Garage Psych",
+                        "spotify_id": "garage psych",
+                        "subgenres": [],
+                        "popularity": 3987
                     },
                     {
                         "name": "Heavy Psych",
