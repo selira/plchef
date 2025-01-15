@@ -799,9 +799,9 @@ function defaultNumberOfSongsChanged(value: number) {
   }
 }
 
-function randomSelectionNumberOfSongsChanged(value: number) {
-  randomSelectionNumberOfSongs.value = value
-}
+// function randomSelectionNumberOfSongsChanged(value: number) {
+//   randomSelectionNumberOfSongs.value = value
+// }
 
 function defaultNumberOfAlbumsChanged(value: number) {
   defaultNumberOfAlbums.value = value

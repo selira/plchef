@@ -75,7 +75,8 @@
     </q-drawer>
 
     <q-page-container>
-      <q-page class="column items-center justify-evenly">
+      <q-page>
+        <div class="column items-center justify-evenly">
         <div v-if="!spotifyAuthStore.isLoggedIn" class="q-pa-sm">
           <div v-if="isMobile">
             <h4>
@@ -117,17 +118,57 @@
             </div>
           </q-btn>
         </div>
-        <!-- <div v-if="!spotifyAuthStore.isLoggedIn" class="col">
-          <p class="q-ma-none q-pa-none">Demo:</p>
-          <iframe
-            :width="isMobile ? 300 : 560" :height="isMobile ? 200 : 316" src="https://www.youtube.com/embed/W4AZOf0nGqU?si=19PSHzOlvCgLD_9h" 
-            title="YouTube video player" frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-          >
-          </iframe>
-          
-        </div> -->
+        <div :style="'width: ' + (pixels - 300) + 'px;'" v-if="!isMobile && !spotifyAuthStore.isLoggedIn">
+          <div class="q-pa-md q-mb-md">
+            <q-carousel
+              arrows
+              animated
+              v-model="slide"
+              :height="(pixels - 300) / 1.77 +'px'"
+              navigation
+              control-color="accent"
+              control-type="regular"
+              :autoplay="autoplay"
+              @mouseenter="autoplay = false"
+              @mouseleave="autoplay = 10000"
+              infinite
+            >
+              <q-carousel-slide :name="1" img-src="images/Demo1.png">
+                <div class="absolute-top custom-caption">
+                  <div class="text-subtitle1">
+                    Choose groups of songs related to artists: Their top songs, latest release, browse their catalog, their most popular albums and random songs.
+                    Add the songs to your playlist clicking the button on the bottom left. Use the menu in the top to change the artists in the page:
+                    your top artists, artists from a genre, or your followed artists.
+                  </div>
+                </div>
+              </q-carousel-slide>
+              <q-carousel-slide :name="2" img-src="images/Demo2.png">
+                <div class="absolute-top custom-caption">
+                  <div class="text-subtitle1">
+                    Browse more than 6000 genres in a tree and a list view. Choose up to 5 genres and up to 200
+                    songs per genre to add to your playlist. You can also play songs from the selected genres directly if you have a premium Spotify subscription.
+                  </div>
+                </div>
+              </q-carousel-slide>
+              <q-carousel-slide :name="3" img-src="images/Demo3.png">
+                <div class="absolute-top custom-caption">
+                  <div class="text-subtitle1">
+                    You can add your selected songs to a new playlist or one of your saved playlists.
+                    Shuffle and preview the songs from each section.
+                  </div>
+                </div>
+              </q-carousel-slide>
+              <q-carousel-slide :name="4" img-src="images/Demo4.png">
+                <div class="absolute-top custom-caption">
+                  <div class="text-subtitle1">
+                    The app allows for flexible playlist creation. For example, if you're interested in a particular genre, you can create a playlist by
+                    adding the most popular albums from artists, by changing the default song selection in the top menu, and loading the songs with one click per artist.
+                  </div>
+                </div>
+              </q-carousel-slide>
+            </q-carousel>
+          </div>
+        </div>
         <div v-if="spotifyAuthStore.isLoggedIn" class="q-pa-md">
           <div class="row justify-between" v-if="isMobile">
             <div class="col-12 q-mt-sm">
@@ -359,6 +400,7 @@
             <a :href="playlistURI" target="_blank">Playlist Link to App</a>
           </div>
         </div>
+      </div>
       </q-page>
     </q-page-container>
 
@@ -473,10 +515,13 @@ const playlistSectionsStore = usePlaylistSectionsStore()
 const localStorageStore = useLocalStorageStore()
 const requestsStore = useSpotifyRequests()
 const stateStore = useStateStore()
+const slide = ref(1)
 
 const router = useRouter()
 
 const isMobile = ref(false)
+const pixels = ref(0)
+const autoplay = ref(10000) as any
 
 const loading = ref(false)
 const createPlaylistLoading = ref(false)
@@ -880,6 +925,7 @@ function addToPlaylistClass() {
 
 function resizeListener() {
   const width = window.innerWidth
+  pixels.value = width
   if (width < 1024) {
     isMobile.value = true
   } else {
@@ -911,5 +957,12 @@ function resizeListener() {
   .lightgrey-blackground {
     background-color: rgb(52, 62, 75);
   }
+}
+
+.custom-caption {
+  text-align: center;
+  padding: 12px;
+  color: white;
+  background-color: rgba(0, 0, 0, .7);
 }
 </style>

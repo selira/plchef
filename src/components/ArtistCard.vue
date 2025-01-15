@@ -761,21 +761,23 @@ function sliderChange(value: number) {
 }
 
 function artistPictureClicked() {
-  if (spotifyAuthStore.isPremium) {
-    playTopSong()
-  } else {
-    artist.value.selected = !artist.value.selected
-    artistSelected()
-  }
+  artist.value.selected = !artist.value.selected
+  artistSelected()
+  // if (spotifyAuthStore.isPremium) {
+  //   playTopSong()
+  // } else {
+  //   artist.value.selected = !artist.value.selected
+  //   artistSelected()
+  // }
 }
 
-async function playTopSong() {
-  const topSong = await getTopSong(artist.value)
-  if (topSong === undefined) {
-    return
-  }
-  playSong(topSong)
-}
+// async function playTopSong() {
+//   const topSong = await getTopSong(artist.value)
+//   if (topSong === undefined) {
+//     return
+//   }
+//   playSong(topSong)
+// }
 
 function artistSelected() {
   if (artist.value.selection.value === 'top-10' && artist.value.loadedSongs.length === 0) {

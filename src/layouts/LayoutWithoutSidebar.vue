@@ -2,9 +2,10 @@
   <q-layout view="hhh lpr fff">
     <q-header class="bg-info text-white" height-hint="98">
       <q-toolbar>
-        <q-toolbar-title @click="router.push('/')" style="text-overflow: clip;">
+        <q-toolbar-title style="text-overflow: clip;">
             <img
               src="icons/Logo.png"
+              @click="router.push('/')"
               style="max-height: 58px; margin-bottom: -9px;"
               class="q-mt-sm"
             />
