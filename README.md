@@ -7,8 +7,6 @@ A Vue webapp for exploring the Spotify catalogue and making playlists quickly. B
 ![Demo1](public/images/Demo1.png)
 ![Demo2](public/images/Demo2.png)
 ![Demo3](public/images/Demo3.png)
-![Demo4](public/images/Demo4.png)
-
 
 ## Install the dependencies
 ```bash
@@ -20,11 +18,11 @@ npm install
 npm run dev
 ```
 
-### Build the app for production (better performance, )
+### Build the app for production (better performance, all genres)
 ```bash
 npm i -g @quasar/cli #installing the quasar cli
 quasar build
-quasar server --history dist/spa
+quasar serve --history dist/spa
 ```
 
 See Quasar Docs for more build information.
