@@ -14,11 +14,13 @@ npm install
 ```
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
+Make the env file from example.
 ```bash
 npm run dev
 ```
 
 ### Build the app for production (better performance, all genres)
+Make the env.production file from example.
 ```bash
 npm i -g @quasar/cli #installing the quasar cli
 quasar build
