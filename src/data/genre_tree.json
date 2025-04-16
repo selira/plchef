@@ -5571,12 +5571,6 @@
                         "popularity": 1894
                     },
                     {
-                        "name": "Underground Rap",
-                        "spotify_id": "underground rap",
-                        "subgenres": [],
-                        "popularity": 2759
-                    },
-                    {
                         "name": "Japanese Underground Rap",
                         "spotify_id": "japanese underground rap",
                         "subgenres": [],
@@ -24242,12 +24236,6 @@
                         "spotify_id": "atmospheric doom",
                         "subgenres": [],
                         "popularity": 4462
-                    },
-                    {
-                        "name": "Funeral Doom",
-                        "spotify_id": "funeral doom",
-                        "subgenres": [],
-                        "popularity": 4997
                     },
                     {
                         "name": "Death Doom",
