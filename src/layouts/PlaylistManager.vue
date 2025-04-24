@@ -76,14 +76,17 @@
 
     <q-page-container>
       <q-page>
-        <div class="column items-center justify-evenly">
-        <div v-if="!spotifyAuthStore.isLoggedIn" class="q-pa-sm">
+        <div class="column items-center justify-evenly no-wrap">
+        <div v-if="!spotifyAuthStore.isLoggedIn" class="q-pa-sm q-mx-xl">
           <div v-if="isMobile">
             <h4>
               Build Spotify Playlists Faster, Discover More Music
             </h4>
             <h5> 
               Explore artists, dive into genres, and add groups of songs to create playlists with ease—your way, every time.
+            </h5>
+            <h5> 
+              Free and <a href="https://github.com/selira/plchef" target="_blank">open-source</a>.
             </h5>
           </div>
           <div v-else>
@@ -93,80 +96,128 @@
             <h4> 
               Explore artists, dive into genres, and add groups of songs to create playlists with ease—your way, every time.
             </h4>
+            <h4> 
+              Free and <a href="https://github.com/selira/plchef" target="_blank">open-source</a>.
+            </h4>
+            <br><br><br><br><br>
           </div>
         </div>
-        <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg">
-          <q-btn color="secondary" push @click="router.push('login')" size="lg" no-caps>
-            <div class="row items-center no-wrap">
-              <q-icon
-                name="img:icons/Spotify_Icon_RGB_Black.png"
-                size="md"
-                class='q-mr-md'
-              />
-              <div class="text-center">
-                Login with Spotify
+        <div class="row q-mx-lg" v-if="!spotifyAuthStore.isLoggedIn">
+          <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg">
+            <q-btn color="secondary" push @click="router.push('login')" size="lg" no-caps>
+              <div class="row items-center no-wrap">
+                <q-icon
+                  name="img:icons/Spotify_Icon_RGB_Black.png"
+                  size="md"
+                  class='q-mr-md'
+                />
+                <div class="text-center">
+                  Login with Spotify
+                </div>
               </div>
-            </div>
-          </q-btn>
-        </div>
-        <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg">
-          <q-btn color="accent" push @click="router.push('genres')" size="lg">
-            <div class="row items-center no-wrap">
-              <div class="text-center">
-                Browse Genres
+            </q-btn>
+          </div>
+          <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg q-ml-xl">
+            <q-btn color="primary" push @click="router.push('genres')" size="lg" no-caps>
+              <div class="row items-center no-wrap">
+                <div class="text-center">
+                  Browse Genres
+                </div>
               </div>
-            </div>
-          </q-btn>
+            </q-btn>
+          </div>
         </div>
-        <div :style="'width: ' + (pixels - 300) + 'px;'" v-if="!isMobile && !spotifyAuthStore.isLoggedIn">
+        <div class="q-mx-xl" v-if="!isMobile && !spotifyAuthStore.isLoggedIn">
+          <br><br><br><br><br>
           <div class="q-pa-md q-mb-md">
-            <q-carousel
-              arrows
-              animated
-              v-model="slide"
-              :height="(pixels - 300) / 1.77 +'px'"
-              navigation
-              control-color="accent"
-              control-type="regular"
-              :autoplay="autoplay"
-              @mouseenter="autoplay = false"
-              @mouseleave="autoplay = 10000"
-              infinite
-            >
-              <q-carousel-slide :name="1" img-src="images/Demo1.png">
-                <div class="absolute-top custom-caption">
-                  <div class="text-subtitle1">
-                    Choose groups of songs related to artists: Their top songs, latest release, browse their catalog, their most popular albums and random songs.
-                    Add the songs to your playlist clicking the button on the bottom left. Use the menu in the top to change the artists in the page:
-                    your top artists, artists from a genre, or your followed artists.
-                  </div>
-                </div>
-              </q-carousel-slide>
-              <q-carousel-slide :name="2" img-src="images/Demo2.png">
-                <div class="absolute-top custom-caption">
-                  <div class="text-subtitle1">
-                    Browse more than 6000 genres in a tree and a list view. Choose up to 5 genres and up to 200
-                    songs per genre to add to your playlist. You can also play songs from the selected genres directly if you have a premium Spotify subscription.
-                  </div>
-                </div>
-              </q-carousel-slide>
-              <q-carousel-slide :name="3" img-src="images/Demo3.png">
-                <div class="absolute-top custom-caption">
-                  <div class="text-subtitle1">
-                    You can add your selected songs to a new playlist or one of your saved playlists.
-                    Shuffle and preview the songs from each section.
-                  </div>
-                </div>
-              </q-carousel-slide>
-              <q-carousel-slide :name="4" img-src="images/Demo4.png">
-                <div class="absolute-top custom-caption">
-                  <div class="text-subtitle1">
-                    The app allows for flexible playlist creation. For example, if you're interested in a particular genre, you can create a playlist by
-                    adding the most popular albums from artists, by changing the default song selection in the top menu, and loading the songs with one click per artist.
-                  </div>
-                </div>
-              </q-carousel-slide>
-            </q-carousel>
+            <!-- Section 1 -->
+            <div class="row items-center q-mb-xl">
+              <div class="col-8">
+                <img src="images/Demo4.png" style="width: 100%; border-radius: 8px;">
+              </div>
+              <div class="col-4 q-px-xl">
+                <h4>Artist Management</h4>
+                <p class="text-subtitle1 features-list">
+                  Browse artists and add their songs to your playlist:
+                  <br><br>
+                  • Top songs
+                  <br>
+                  • Latest releases
+                  <br>
+                  • Popular albums
+                  <br>
+                  • Random tracks
+                  <br><br>
+                  Switch between your top artists, genre artists, and artists you follow.
+                </p>
+              </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="row items-center q-mb-xl">
+              <div class="col-4 q-px-lg">
+                <h4>Genre Discovery</h4>
+                <p class="text-subtitle1">
+                  Browse genres in two views: <br>
+                  • Tree view
+                  <br>
+                  • List view
+                  <br>
+                  Select up to 5 genres and 200 songs per genre.
+                  <br>
+                  Premium users can play songs directly from selected genres.
+                </p>
+              </div>
+              <div class="col-8">
+                <img src="images/Demo2.png" style="width: 100%; border-radius: 8px;">
+              </div>
+            </div>
+
+            <!-- Section 3 -->
+            <div class="row items-center q-mb-xl">
+              <div class="col-8">
+                <img src="images/Demo3.png" style="width: 100%; border-radius: 8px;">
+              </div>
+              <div class="col-4 q-px-xl">
+                <h4>Playlist Management</h4>
+                <p class="text-subtitle1">
+                  Manage you playlist with ease:
+                  <br><br>
+                  • Add to new Spotify playlist
+                  <br>
+                  • Add to saved Spotify playlist
+                  <br>
+                  • Shuffle songs
+                  <br>
+                  • Preview by section
+                </p>
+              </div>
+            </div>
+
+            <!-- Section 4 -->
+            <div class="row items-center">
+              <div class="col-4 q-px-lg">
+                <h4>Flexible Selection</h4>
+                <p class="text-subtitle1">
+                  Create playlists your way:
+                  <br><br>
+                    • Choose your favorite genres
+                  <br>
+                    • Browse artists' top albums
+                  <br>
+                    • Customize song selection
+                  <br>
+                    • Add multiple songs with one click
+                  <br>
+                    • Mix and match from different sources
+                  <br>
+                    • Quick-add entire collections
+                </p>
+              </div>
+              <div class="col-8">
+                <img src="images/Demo1.png" style="width: 100%; border-radius: 8px;">
+              </div>
+            </div>
           </div>
         </div>
         <div v-if="spotifyAuthStore.isLoggedIn" class="q-pa-md">
@@ -515,13 +566,11 @@ const playlistSectionsStore = usePlaylistSectionsStore()
 const localStorageStore = useLocalStorageStore()
 const requestsStore = useSpotifyRequests()
 const stateStore = useStateStore()
-const slide = ref(1)
 
 const router = useRouter()
 
 const isMobile = ref(false)
 const pixels = ref(0)
-const autoplay = ref(10000) as any
 
 const loading = ref(false)
 const createPlaylistLoading = ref(false)
@@ -946,6 +995,24 @@ function resizeListener() {
   .tableText {
     color: black;
   }
+}
+
+.text-subtitle1 {
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+h4 {
+  margin-bottom: 1rem;
+}
+
+.features-list {
+  line-height: 1.6;
+}
+
+.features-list br {
+  display: block;
+  content: "";
 }
 
 .body--dark {
