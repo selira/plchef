@@ -86,7 +86,7 @@
               Explore artists, dive into genres, and add groups of songs to create playlists with ease—your way, every time.
             </h5>
             <h5> 
-              Free and <a href="https://github.com/selira/plchef" target="_blank">open-source</a>.
+              Free and open-source.
             </h5>
           </div>
           <div v-else>
@@ -97,7 +97,7 @@
               Explore artists, dive into genres, and add groups of songs to create playlists with ease—your way, every time.
             </h4>
             <h4> 
-              Free and <a href="https://github.com/selira/plchef" target="_blank">open-source</a>.
+              Free and open-source.
             </h4>
             <br><br><br><br><br>
           </div>
