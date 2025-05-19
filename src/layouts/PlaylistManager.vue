@@ -103,7 +103,7 @@
           </div>
         </div>
         <div v-if="!spotifyAuthStore.isLoggedIn">
-          <div v-if="isMobile" class="q-mx-lg">
+          <div v-if="isMobile" class="q-mx-lg column items-center">
             <div class="q-mb-lg">
               <q-btn color="secondary" push @click="router.push('login')" size="lg" no-caps>
                 <div class="row items-center no-wrap">
@@ -118,7 +118,7 @@
                 </div>
               </q-btn>
             </div>
-            <div class="q-mb-lg q-ml-xl">
+            <div class="q-mb-lg">
               <q-btn color="primary" push @click="router.push('genres')" size="lg" no-caps>
                 <div class="row items-center no-wrap">
                   <div class="text-center">

@@ -2,12 +2,12 @@
   <q-page class="column items-center justify-evenly">
     <q-card v-if="!spotifyAuthStore.isLoggedIn">
       <q-card-section>
-        <div class="text-h6">Set up you Spotify API Credentials:</div>
+        <div class="text-h6">Set up your Spotify API Credentials:</div>
       </q-card-section>
       <q-card-section>
-        <div> Sign in to Spotify on <a href="https://developer.spotify.com" target="_blank">developer.spotify.com </a>.</div>
+        <div> Sign in to Spotify on <a href="https://developer.spotify.com" target="_blank">developer.spotify.com</a>.</div>
         <div> Go to the API Dashboard (top right) and "Create app". </div>
-        <div> Add "{{redirectUrl}}" to the Redirect URIs. <q-btn square color="primary" icon="content_paste" @click="copyClip()" class="q-ml-md" /> </div>
+        <div> Add "{{redirectUrl}}" to Redirect URIs. <q-btn square dense color="primary" icon="content_paste" @click="copyClip()" class="q-ml-sm" size="sm" /> </div>
         <div> Check Web API under "APIs used". </div>
         <div> Go to app settings (top right in dashboard view). </div>
         <div> Copy the app's "Client ID" into this form and click save. </div>
@@ -67,3 +67,14 @@ function copyClip() {
   $q.notify(redirectUrl.value + ' copied to clipboard')
 }
 </script>
+
+<style scoped>
+a { 
+  text-decoration:none; 
+  color:#2097ff;
+ } 
+a:hover {
+    text-decoration:none; 
+    cursor:pointer;  
+}
+</style>
