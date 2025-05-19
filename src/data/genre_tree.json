@@ -4499,12 +4499,6 @@
                                         "popularity": 642
                                     },
                                     {
-                                        "name": "Florida Drill",
-                                        "spotify_id": "florida drill",
-                                        "subgenres": [],
-                                        "popularity": 454
-                                    },
-                                    {
                                         "name": "German Drill",
                                         "spotify_id": "german drill",
                                         "subgenres": [],
@@ -4734,12 +4728,6 @@
                                 "spotify_id": "drill espanol",
                                 "subgenres": [],
                                 "popularity": 481
-                            },
-                            {
-                                "name": "Melodic Drill",
-                                "spotify_id": "melodic drill",
-                                "subgenres": [],
-                                "popularity": 314
                             }
                         ],
                         "popularity": 401
@@ -7206,6 +7194,25 @@
                                 "popularity": 3322
                             },
                             {
+                                "name": "Turkish Hip Hop",
+                                "spotify_id": "turkish hip hop",
+                                "subgenres": [
+                                    {
+                                        "name": "New School Turkce Rap",
+                                        "spotify_id": "new school turkce rap",
+                                        "subgenres": [],
+                                        "popularity": 1116
+                                    },
+                                    {
+                                        "name": "Turkce Kadin Rap",
+                                        "spotify_id": "turkce kadin rap",
+                                        "subgenres": [],
+                                        "popularity": 1793
+                                    }
+                                ],
+                                "popularity": 223
+                            },
+                            {
                                 "name": "Azeri Rap",
                                 "spotify_id": "azeri rap",
                                 "subgenres": [],
@@ -7273,25 +7280,6 @@
                                         "popularity": 1293
                                     },
                                     {
-                                        "name": "Turkish Hip Hop",
-                                        "spotify_id": "turkish hip hop",
-                                        "subgenres": [
-                                            {
-                                                "name": "New School Turkce Rap",
-                                                "spotify_id": "new school turkce rap",
-                                                "subgenres": [],
-                                                "popularity": 1116
-                                            },
-                                            {
-                                                "name": "Turkce Kadin Rap",
-                                                "spotify_id": "turkce kadin rap",
-                                                "subgenres": [],
-                                                "popularity": 1793
-                                            }
-                                        ],
-                                        "popularity": 223
-                                    },
-                                    {
                                         "name": "Israeli Hip Hop",
                                         "spotify_id": "israeli hip hop",
                                         "subgenres": [],
@@ -7348,12 +7336,6 @@
                                 "spotify_id": "georgian hip hop",
                                 "subgenres": [],
                                 "popularity": 4344
-                            },
-                            {
-                                "name": "Azeri Rap",
-                                "spotify_id": "azeri rap",
-                                "subgenres": [],
-                                "popularity": 2084
                             },
                             {
                                 "name": "Afghan Rap",
@@ -26718,12 +26700,6 @@
                 "spotify_id": "edm",
                 "subgenres": [
                     {
-                        "name": "Eurodance",
-                        "spotify_id": "eurodance",
-                        "subgenres": [],
-                        "popularity": 244
-                    },
-                    {
                         "name": "Groove Room",
                         "spotify_id": "groove room",
                         "subgenres": [],
@@ -32637,12 +32613,6 @@
                 "spotify_id": "nu jazz",
                 "subgenres": [],
                 "popularity": 736
-            },
-            {
-                "name": "Jazz Quartet",
-                "spotify_id": "jazz quartet",
-                "subgenres": [],
-                "popularity": 2000
             },
             {
                 "spotify_id": "jazz fusion",

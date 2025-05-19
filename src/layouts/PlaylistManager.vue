@@ -77,7 +77,7 @@
     <q-page-container>
       <q-page>
         <div class="column items-center justify-evenly no-wrap">
-        <div v-if="!spotifyAuthStore.isLoggedIn" class="q-pa-sm q-mx-xl">
+        <div v-if="!spotifyAuthStore.isLoggedIn" :class="isMobile ? 'q-pa-sm q-mx-md' :'q-pa-sm q-mx-xl'">
           <div v-if="isMobile">
             <h4>
               Build Spotify Playlists Faster, Discover More Music
@@ -102,29 +102,56 @@
             <br><br><br><br><br>
           </div>
         </div>
-        <div class="row q-mx-lg" v-if="!spotifyAuthStore.isLoggedIn">
-          <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg">
-            <q-btn color="secondary" push @click="router.push('login')" size="lg" no-caps>
-              <div class="row items-center no-wrap">
-                <q-icon
-                  name="img:icons/Spotify_Icon_RGB_Black.png"
-                  size="md"
-                  class='q-mr-md'
-                />
-                <div class="text-center">
-                  Login with Spotify
+        <div v-if="!spotifyAuthStore.isLoggedIn">
+          <div v-if="isMobile" class="q-mx-lg">
+            <div class="q-mb-lg">
+              <q-btn color="secondary" push @click="router.push('login')" size="lg" no-caps>
+                <div class="row items-center no-wrap">
+                  <q-icon
+                    name="img:icons/Spotify_Icon_RGB_Black.png"
+                    size="md"
+                    class='q-mr-md'
+                  />
+                  <div class="text-center">
+                    Login with Spotify
+                  </div>
                 </div>
-              </div>
-            </q-btn>
+              </q-btn>
+            </div>
+            <div class="q-mb-lg q-ml-xl">
+              <q-btn color="primary" push @click="router.push('genres')" size="lg" no-caps>
+                <div class="row items-center no-wrap">
+                  <div class="text-center">
+                    Browse Genres
+                  </div>
+                </div>
+              </q-btn>
+            </div>
           </div>
-          <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg q-ml-xl">
-            <q-btn color="primary" push @click="router.push('genres')" size="lg" no-caps>
-              <div class="row items-center no-wrap">
-                <div class="text-center">
-                  Browse Genres
+          <div class="row q-mx-lg" v-else>
+            <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg">
+              <q-btn color="secondary" push @click="router.push('login')" size="lg" no-caps>
+                <div class="row items-center no-wrap">
+                  <q-icon
+                    name="img:icons/Spotify_Icon_RGB_Black.png"
+                    size="md"
+                    class='q-mr-md'
+                  />
+                  <div class="text-center">
+                    Login with Spotify
+                  </div>
                 </div>
-              </div>
-            </q-btn>
+              </q-btn>
+            </div>
+            <div v-if="!spotifyAuthStore.isLoggedIn" class="q-mb-lg q-ml-xl">
+              <q-btn color="primary" push @click="router.push('genres')" size="lg" no-caps>
+                <div class="row items-center no-wrap">
+                  <div class="text-center">
+                    Browse Genres
+                  </div>
+                </div>
+              </q-btn>
+            </div>
           </div>
         </div>
         <div class="q-mx-xl" v-if="!isMobile && !spotifyAuthStore.isLoggedIn">
